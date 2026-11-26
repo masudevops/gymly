@@ -6,7 +6,7 @@ import { useAuth } from '@/features/auth/auth-provider';
 import type { Json } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
-import type { SavePayload } from './model';
+import type { SavePayload, UpdatePayload } from './model';
 import { useWorkoutStore } from './store';
 
 const PAGE = 20;
@@ -140,6 +140,21 @@ export function useLastSets(exerciseIds: string[]) {
       const map: Record<string, LastSet[]> = {};
       for (const row of data) (map[row.exercise_id] ??= []).push(row);
       return map;
+    },
+  });
+}
+
+export function useUpdateWorkout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: UpdatePayload) => {
+      const { error } = await supabase.rpc('update_workout', { payload: payload as unknown as Json });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      queryClient.invalidateQueries({ queryKey: ['last-sets'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });
 }

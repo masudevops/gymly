@@ -34,7 +34,7 @@ export function useNow(intervalMs = 1000) {
  * Numeric cell that keeps the raw text while typing (so "102." or "" don't get reformatted mid-edit)
  * and resyncs from the store when not focused.
  */
-function NumberCell({ value, onChange, placeholder, done, label }: { value: string; onChange: (n: number | null) => void; placeholder?: string; done: boolean; label: string }) {
+export function NumberCell({ value, onChange, placeholder, done, label }: { value: string; onChange: (n: number | null) => void; placeholder?: string; done: boolean; label: string }) {
   const [text, setText] = useState(value);
   const focused = useRef(false);
   useEffect(() => {

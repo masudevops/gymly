@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { CloudOff, PartyPopper, Trash2, Trophy } from 'lucide-react-native';
+import { CloudOff, PartyPopper, Pencil, Trash2, Trophy } from 'lucide-react-native';
 import { View } from 'react-native';
 
 import { ErrorNote, Header, IconButton, Loading } from '@/components/form';
@@ -79,9 +79,14 @@ export default function WorkoutDetailScreen() {
       <Header
         onBack={justFinished ? goHome : undefined}
         right={
-          <IconButton label="Delete workout" onPress={onDelete}>
-            <Trash2 color={colors.danger} size={20} />
-          </IconButton>
+          <View className="flex-row">
+            <IconButton label="Edit workout" onPress={() => router.push(`/history/${w.id}/edit`)}>
+              <Pencil color={colors.fg} size={19} />
+            </IconButton>
+            <IconButton label="Delete workout" onPress={onDelete}>
+              <Trash2 color={colors.danger} size={20} />
+            </IconButton>
+          </View>
         }
       />
 

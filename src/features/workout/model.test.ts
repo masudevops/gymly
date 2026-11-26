@@ -127,3 +127,36 @@ describe('stats and save payload', () => {
     expect(M.toSavePayload(w).name).toBe('Workout');
   });
 });
+
+describe('editing saved workouts', () => {
+  const saved: M.SavedWorkout = {
+    id: 'w1',
+    name: 'Push',
+    notes: null,
+    started_at: '2026-11-20T10:00:00.000Z',
+    workout_exercises: [
+      { notes: null, exercise: { id: 'ex-bench', name: 'Barbell Bench Press', kind: 'weight_reps' }, workout_sets: [{ weight_kg: 1000, reps: 5, duration_seconds: null, rpe: null, is_warmup: false }] },
+      { notes: null, exercise: null, workout_sets: [] }, // exercise no longer visible: skipped
+    ],
+  };
+
+  it('loads every saved set as done and keeps the original date', () => {
+    const w = M.fromSavedWorkout(saved);
+    expect(w.startedAt).toBe(saved.started_at);
+    expect(w.exercises).toHaveLength(1);
+    expect(w.exercises[0].sets[0]).toMatchObject({ weightKg: 1000, reps: 5, done: true });
+  });
+
+  it('builds an update payload with corrected values and new sets, dropping incomplete ones', () => {
+    let w = M.fromSavedWorkout(saved);
+    const ex = w.exercises[0];
+    w = M.updateSet(w, ex.key, ex.sets[0].key, { weightKg: 100 });
+    w = M.addSet(w, ex.key); // pre-filled copy, counts even though never "ticked"
+    w = M.addSet(w, ex.key);
+    w = M.updateSet(w, ex.key, w.exercises[0].sets[2].key, { reps: null }); // incomplete: dropped
+    const p = M.toUpdatePayload({ ...w, name: 'Push (fixed)' });
+    expect(p).toMatchObject({ id: 'w1', name: 'Push (fixed)' });
+    expect(p.exercises[0].sets.map((s) => [s.weight_kg, s.reps])).toEqual([[100, 5], [100, 5]]);
+    expect(p).not.toHaveProperty('started_at');
+  });
+});

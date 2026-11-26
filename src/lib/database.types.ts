@@ -309,6 +309,9 @@ isOneToOne: false
               "day": string,"volume_kg": number,"workouts": number
             }[]
                            },
+"update_workout":
+{ Args: { "payload": Json }; Returns: string
+                           },
 "weekly_muscle_sets":
 { Args: { "p_tz": string,"p_weeks": number }; Returns: {
               "muscle": Database["public"]['Enums']["muscle_group"],"sets": number,"week_start": string
