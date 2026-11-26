@@ -36,6 +36,7 @@ The schema lives in `supabase/migrations/`; `supabase/seed.sql` loads the 140-ex
 | `npm run typecheck` | TypeScript check |
 | `npm run lint` | ESLint (`expo lint`) |
 | `npm test` | Jest unit tests |
+| `npm run e2e` | Playwright browser tests (needs `npx supabase start`; reuses `npm run web` if running) |
 | `npx expo export --platform web` | Production web build to `dist/` |
 
 ## Project layout
