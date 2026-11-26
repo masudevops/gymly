@@ -19,7 +19,8 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 ## Architecture (Phase 1)
 - Auth gating via `Stack.Protected` in `src/app/_layout.tsx`: signed out → sign-in/up; no `onboarded_at` → onboarding; else app.
 - Active workout = pure model (`features/workout/model.ts`, unit-tested) + zustand store persisted to AsyncStorage. Finish moves it to `pendingSaves`; `usePendingSaveSync` pushes via the `save_workout` RPC (idempotent on the client-generated workout id), so offline workouts are never lost or duplicated.
-- DB functions: `save_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
+- Editing a saved workout: `/history/[id]/edit` uses `fromSavedWorkout`/`toUpdatePayload` and the `update_workout` RPC (replaces exercises/sets, keeps date and program link).
+- DB functions: `save_workout`, `update_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
 - Env: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (Claude can't read/write `.env.local`; the user fills it). On Vercel, `scripts/build-web.js` maps the Supabase integration's public vars onto these names and refuses secret keys.
 
 ## Stats (Phase 2)

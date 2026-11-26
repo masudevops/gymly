@@ -193,3 +193,56 @@ export function toSavePayload(w: ActiveWorkout, finishedAt = new Date()) {
 }
 
 export type SavePayload = ReturnType<typeof toSavePayload>;
+
+/** A saved workout as loaded for editing (shape of useWorkoutDetail). */
+export type SavedWorkout = {
+  id: string;
+  name: string;
+  notes: string | null;
+  started_at: string;
+  workout_exercises: {
+    notes: string | null;
+    exercise: { id: string; name: string; kind: ExerciseKind } | null;
+    workout_sets: { weight_kg: number | null; reps: number | null; duration_seconds: number | null; rpe: number | null; is_warmup: boolean }[];
+  }[];
+};
+
+/** Turns a saved workout into the editable model. Every saved set counts as done. */
+export function fromSavedWorkout(w: SavedWorkout): ActiveWorkout {
+  return {
+    id: w.id,
+    name: w.name,
+    notes: w.notes ?? '',
+    templateId: null,
+    program: null,
+    startedAt: w.started_at,
+    exercises: w.workout_exercises
+      .filter((we) => we.exercise)
+      .map((we) => ({
+        key: newKey(),
+        exerciseId: we.exercise!.id,
+        name: we.exercise!.name,
+        kind: we.exercise!.kind,
+        notes: we.notes ?? '',
+        restSeconds: null,
+        sets: we.workout_sets.map((s) => ({
+          key: newKey(),
+          weightKg: s.weight_kg === null ? null : Number(s.weight_kg),
+          reps: s.reps,
+          durationSeconds: s.duration_seconds,
+          rpe: s.rpe === null ? null : Number(s.rpe),
+          isWarmup: s.is_warmup,
+          done: true,
+        })),
+      })),
+  };
+}
+
+/** Payload for update_workout: like a save, but every complete set is kept (no "done" ticks when editing). */
+export function toUpdatePayload(w: ActiveWorkout) {
+  const all = { ...w, exercises: w.exercises.map((e) => ({ ...e, sets: e.sets.map((s) => ({ ...s, done: true })) })) };
+  const { id, name, notes, exercises } = toSavePayload(all);
+  return { id, name, notes, exercises };
+}
+
+export type UpdatePayload = ReturnType<typeof toUpdatePayload>;
