@@ -10,7 +10,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Expo SDK 58, Expo Router (routes in `src/app/`), React 19, RN 0.88, TypeScript 6. **AGENTS.md applies: check the SDK 58 docs, don't trust memory for Expo APIs.** Install packages with `npx expo install`.
 - NativeWind 4 + Tailwind **3.4** (not v4; NativeWind 4 doesn't support it). Colors/fonts in `src/theme/tokens.js`, used by both classes and JS.
 - Supabase (local via `npx supabase`, needs Colima running). TanStack Query; active workout persisted on device.
-- Tests: Jest (`jest-expo`). CI: `.github/workflows/ci.yml` (typecheck, lint, test, web build).
+- Tests: Jest (`jest-expo`) for logic; Playwright E2E in `e2e/` (`npm run e2e`, local Supabase; helpers for sign-up, SQL seeding via `docker exec supabase_db_gymly`, Mailpit emails). CI: `check` (typecheck, lint, unit, web build) + `e2e` (Supabase on the runner, static build served as SPA). Add an E2E test for every user-facing flow you change.
 
 ## Commands
 - `npm run web` | `npm run typecheck` | `npm run lint` | `npm test` | `npx expo export --platform web`
