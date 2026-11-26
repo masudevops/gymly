@@ -1,14 +1,17 @@
 import { router } from 'expo-router';
-import { ChevronRight, CloudOff, Flame, LayoutList, Pencil, Play, Plus } from 'lucide-react-native';
+import { Check, ChevronRight, CloudOff, Flame, LayoutList, Pencil, Play, Plus } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
 import { EmptyState, ErrorNote, IconButton, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
 import { useProfile } from '@/features/profile/api';
+import { useTrainingDays } from '@/features/progress/api';
 import { toTemplateSeed, useTemplates, type Template } from '@/features/templates/api';
 import { useNow } from '@/features/workout/components';
 import { useWorkoutStore } from '@/features/workout/store';
+import { cn } from '@/lib/cn';
 import { confirm } from '@/lib/confirm';
+import { toDay, weekDays, weeklyStreak } from '@/lib/dates';
 import { formatClock } from '@/lib/format';
 import { colors } from '@/theme/tokens';
 
@@ -58,6 +61,48 @@ function TemplateCard({ template, onStart }: { template: Template; onStart: () =
   );
 }
 
+const WEEKDAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+function ThisWeek({ target }: { target: number }) {
+  const days = useTrainingDays(16);
+  const trained = new Set((days.data ?? []).map((d) => d.day));
+  const week = weekDays(new Date());
+  const today = toDay(new Date());
+  const done = week.filter((d) => trained.has(d)).length;
+  const streak = weeklyStreak([...trained]);
+  return (
+    <Pressable onPress={() => router.navigate('/progress')} accessibilityRole="button" accessibilityLabel={`${done} of ${target} workouts this week, ${streak} week streak. Open progress`}>
+      <Card className="mt-6">
+        <View className="flex-row items-center justify-between">
+          <AppText variant="heading">This week</AppText>
+          <View className="flex-row items-center gap-3">
+            <AppText variant="label" className="text-fg">{done}/{target}</AppText>
+            <View className="flex-row items-center gap-1">
+              <Flame color={streak > 0 ? colors.volt : colors.faint} size={16} />
+              <AppText variant="label" className="text-fg">{streak} wk</AppText>
+            </View>
+          </View>
+        </View>
+        <View className="mt-4 flex-row justify-between">
+          {week.map((d, i) => (
+            <View key={d} className="items-center gap-2">
+              <View
+                className={cn(
+                  'h-9 w-9 items-center justify-center rounded-full border',
+                  trained.has(d) ? 'border-volt bg-volt' : d === today ? 'border-fg/60 bg-raised' : 'border-line bg-raised',
+                )}
+              >
+                {trained.has(d) && <Check color={colors.ink} size={16} strokeWidth={3} />}
+              </View>
+              <AppText variant="caption" className={d === today ? 'font-semibold text-fg' : undefined}>{WEEKDAY_LETTERS[i]}</AppText>
+            </View>
+          ))}
+        </View>
+      </Card>
+    </Pressable>
+  );
+}
+
 export default function TrainScreen() {
   const profile = useProfile().data;
   const templates = useTemplates();
@@ -80,6 +125,7 @@ export default function TrainScreen() {
       <AppText variant="display" className="mt-1">Train</AppText>
 
       <ActiveBanner />
+      <ThisWeek target={profile?.training_days ?? 3} />
 
       {pendingCount > 0 && (
         <View className="mt-4 flex-row items-center gap-2 rounded-xl bg-warning/10 px-4 py-3">

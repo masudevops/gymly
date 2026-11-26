@@ -61,6 +61,8 @@ function RootStack() {
         <Stack.Screen name="exercises/new" options={{ presentation: 'modal' }} />
         <Stack.Screen name="templates/[id]" />
         <Stack.Screen name="history/[id]" />
+        <Stack.Screen name="exercise/[id]" />
+        <Stack.Screen name="body-weight" />
       </Stack.Protected>
     </Stack>
   );

@@ -12,7 +12,7 @@ import { ExerciseCard, RestTimerBar, useNow } from '@/features/workout/component
 import { isSetComplete, workoutStats } from '@/features/workout/model';
 import { useWorkoutStore } from '@/features/workout/store';
 import { confirm } from '@/lib/confirm';
-import { formatClock, formatVolume } from '@/lib/format';
+import { formatClock, formatVolume, plural } from '@/lib/format';
 import { colors } from '@/theme/tokens';
 
 export default function WorkoutScreen() {
@@ -86,7 +86,7 @@ export default function WorkoutScreen() {
             <View className="flex-1 items-center">
               <AppText variant="stat" className="text-2xl">{formatClock(elapsed)}</AppText>
               <AppText variant="caption">
-                {stats.sets} sets · {formatVolume(stats.volumeKg, unit)}
+                {plural(stats.sets, 'set')} · {formatVolume(stats.volumeKg, unit)}
               </AppText>
             </View>
             <Button title="Finish" onPress={onFinish} className="min-h-[44px] px-4" />

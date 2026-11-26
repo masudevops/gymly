@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { CloudOff, PartyPopper, Trash2 } from 'lucide-react-native';
+import { CloudOff, PartyPopper, Trash2, Trophy } from 'lucide-react-native';
 import { View } from 'react-native';
 
 import { ErrorNote, Header, IconButton, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
 import { useUnit } from '@/features/profile/api';
+import { useWorkoutPRs } from '@/features/progress/api';
 import { useDeleteWorkout, useWorkoutDetail } from '@/features/workout/api';
 import { useWorkoutStore } from '@/features/workout/store';
 import { confirm } from '@/lib/confirm';
@@ -21,11 +22,21 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function prLabel(record: string, value: number, previous: number, unit: 'kg' | 'lb') {
+  switch (record) {
+    case 'e1rm': return `est. 1RM ${formatWeight(value, unit)} ${unit} (was ${formatWeight(previous, unit)})`;
+    case 'weight': return `heaviest ${formatWeight(value, unit)} ${unit} (was ${formatWeight(previous, unit)})`;
+    case 'reps': return `${value} reps (was ${previous})`;
+    default: return `${formatClock(value)} (was ${formatClock(previous)})`;
+  }
+}
+
 export default function WorkoutDetailScreen() {
   const { id, done } = useLocalSearchParams<{ id: string; done?: string }>();
   const justFinished = done === '1';
   const pending = useWorkoutStore((s) => s.pendingSaves.find((p) => p.id === id));
   const detail = useWorkoutDetail(id);
+  const prs = useWorkoutPRs(id, !!detail.data);
   const remove = useDeleteWorkout();
   const unit = useUnit();
 
@@ -54,6 +65,8 @@ export default function WorkoutDetailScreen() {
   const w = detail.data;
   const allSets = w.workout_exercises.flatMap((e) => e.workout_sets);
   const volume = totalVolume(allSets.map((s) => ({ weight: s.weight_kg ?? 0, reps: s.reps ?? 0, isWarmup: s.is_warmup })));
+
+  const prExercises = new Set((prs.data ?? []).map((p) => p.exercise_id));
 
   const onDelete = async () => {
     if (await confirm('Delete workout?', 'This workout and all its sets will be permanently removed.', 'Delete', true)) {
@@ -91,6 +104,22 @@ export default function WorkoutDetailScreen() {
         <Stat label="Volume" value={volume > 0 ? formatVolume(volume, unit) : '—'} />
       </View>
 
+      {prs.data && prs.data.length > 0 && (
+        <View className="mt-4 gap-2 rounded-2xl border border-volt/40 bg-volt/10 p-4">
+          <View className="flex-row items-center gap-2">
+            <Trophy color={colors.volt} size={18} />
+            <AppText variant="heading" className="text-volt">
+              {prs.data.length} new personal record{prs.data.length > 1 ? 's' : ''}
+            </AppText>
+          </View>
+          {prs.data.map((pr) => (
+            <AppText key={`${pr.exercise_id}-${pr.record}`} variant="label" className="text-fg">
+              {pr.name}: {prLabel(pr.record, Number(pr.value), Number(pr.previous), unit)}
+            </AppText>
+          ))}
+        </View>
+      )}
+
       <View className="mt-6 gap-3">
         {w.workout_exercises.map((we) => {
           const kind = we.exercise?.kind ?? 'weight_reps';
@@ -100,7 +129,8 @@ export default function WorkoutDetailScreen() {
             <Card key={we.id} className="gap-2 p-4">
               <View className="flex-row items-baseline justify-between">
                 <AppText variant="heading" className="flex-1 text-volt" numberOfLines={1}>{we.exercise?.name}</AppText>
-                {kind === 'weight_reps' && best > 0 && <AppText variant="caption">est. 1RM {formatWeight(best, unit)} {unit}</AppText>}
+                {prExercises.has(we.exercise?.id ?? '') && <Trophy color={colors.volt} size={16} />}
+                {kind === 'weight_reps' && best > 0 && <AppText variant="caption" className="ml-2">est. 1RM {formatWeight(best, unit)} {unit}</AppText>}
               </View>
               {we.workout_sets.map((s) => {
                 if (!s.is_warmup) n += 1;
