@@ -16,6 +16,19 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - `npm run web` | `npm run typecheck` | `npm run lint` | `npm test` | `npx expo export --platform web`
 - `npx supabase start | status | migration new <name>`. **Ask first:** `supabase db reset`, `db push`, `link`.
 
+## Architecture (Phase 1)
+- Auth gating via `Stack.Protected` in `src/app/_layout.tsx`: signed out → sign-in/up; no `onboarded_at` → onboarding; else app.
+- Active workout = pure model (`features/workout/model.ts`, unit-tested) + zustand store persisted to AsyncStorage. Finish moves it to `pendingSaves`; `usePendingSaveSync` pushes via the `save_workout` RPC (idempotent on the client-generated workout id), so offline workouts are never lost or duplicated.
+- DB functions: `save_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
+- Env: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (Claude can't read/write `.env.local`; the user fills it).
+
+## Gotchas
+- Don't run the dev server with `CI=1` (no file watching; you'll test stale code). Use `npx expo start --web`.
+- Web: `<input>` has an intrinsic ~20ch width; inputs in flex rows need `min-w-0 basis-0`.
+- The `workout` screen must not auto-redirect when there's no active workout: Finish clears it, and a redirect raced the navigation to the summary. Finish uses `router.dismissTo('/')` then `push` (so Back from the summary lands on the tabs).
+- NativeWind needs `darkMode: 'class'` (set) or its web runtime throws.
+- `Alert` is a no-op on web; use `lib/confirm.ts`.
+
 ## Conventions
 - UI primitives in `src/components/ui.tsx` (Screen, AppText variants, Card, Button). Use tokens/classes, never raw hex in screens.
 - Store weights in **kg**; convert with `src/lib/fitness.ts` at the UI edge.
