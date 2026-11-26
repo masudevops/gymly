@@ -24,6 +24,11 @@ npx supabase status             # copy the "Publishable" key (sb_publishable_...
 ```
 The schema lives in `supabase/migrations/`; `supabase/seed.sql` loads the 140-exercise library.
 
+## Deployment
+- **Web:** Vercel builds `main` with `node scripts/build-web.js` (maps the Supabase integration's public env vars onto `EXPO_PUBLIC_*`). Live at https://gymly-omega.vercel.app
+- **Database:** hosted Supabase project `vqdldvfucnunuihnytvv`. Apply new migrations with `npx supabase db push --remote` (preview first with `--dry-run`).
+- **Auth URLs:** Supabase → Authentication → URL Configuration must list the site URL and `http://localhost:8081/**`.
+
 ## Scripts
 | Command | What it does |
 |---|---|
@@ -48,5 +53,5 @@ supabase/         local Supabase config, migrations and seed data
 - **Phase 1** ✅ Auth & onboarding, exercise library, workout logging (offline-safe), templates, history
 - **Phase 2** ✅ Progress & stats: PRs (with in-workout PR detection), per-exercise charts, weekly sets per muscle, consistency calendar and streaks, body weight
 - **Phase 3** ✅ Programs: 4 built-in multi-week plans, session-based "up next", automatic completion
-- **Phase 4** Polish, web deploy, hosted Supabase
+- **Phase 4** ✅ Desktop sidebar, password reset, 404/error screens, Gymly icon set; live on Vercel + hosted Supabase
 - Later: iOS/Android store releases, Apple/Google sign-in, HealthKit/Google Fit, nutrition, premium tier
