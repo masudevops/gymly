@@ -4,13 +4,15 @@ import { Pressable, View } from 'react-native';
 
 import { EmptyState, ErrorNote, IconButton, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
+import { useActiveProgram } from '@/features/programs/api';
 import { useProfile } from '@/features/profile/api';
 import { useTrainingDays } from '@/features/progress/api';
 import { toTemplateSeed, useTemplates, type Template } from '@/features/templates/api';
 import { useNow } from '@/features/workout/components';
 import { useWorkoutStore } from '@/features/workout/store';
+import { useBeginWorkout } from '@/features/workout/use-begin-workout';
+import { UpNextCard } from '@/features/programs/up-next-card';
 import { cn } from '@/lib/cn';
-import { confirm } from '@/lib/confirm';
 import { toDay, weekDays, weeklyStreak } from '@/lib/dates';
 import { formatClock } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -107,17 +109,11 @@ export default function TrainScreen() {
   const profile = useProfile().data;
   const templates = useTemplates();
   const active = useWorkoutStore((s) => s.active);
-  const start = useWorkoutStore((s) => s.start);
   const pendingCount = useWorkoutStore((s) => s.pendingSaves.length);
+  const hasProgram = !!useActiveProgram().data;
 
-  const begin = async (template?: Template) => {
-    if (active) {
-      const replace = await confirm('Workout in progress', `Discard "${active.name}" and start a new one?`, 'Discard & start', true);
-      if (!replace) return;
-    }
-    start(template ? toTemplateSeed(template) : undefined);
-    router.push('/workout');
-  };
+  const beginWorkout = useBeginWorkout();
+  const begin = (template?: Template) => beginWorkout(template ? toTemplateSeed(template) : undefined);
 
   return (
     <Screen>
@@ -126,6 +122,7 @@ export default function TrainScreen() {
 
       <ActiveBanner />
       <ThisWeek target={profile?.training_days ?? 3} />
+      <UpNextCard className="mt-4" />
 
       {pendingCount > 0 && (
         <View className="mt-4 flex-row items-center gap-2 rounded-xl bg-warning/10 px-4 py-3">
@@ -138,7 +135,13 @@ export default function TrainScreen() {
 
       {!active && (
         <View className="mt-6 gap-3">
-          <Button title="Start empty workout" icon={<Play color={colors.ink} size={20} fill={colors.ink} />} onPress={() => begin()} />
+          {/* With an active program, its session is the primary action; an empty workout becomes secondary. */}
+          <Button
+            title="Start empty workout"
+            variant={hasProgram ? 'secondary' : 'primary'}
+            icon={<Play color={hasProgram ? colors.fg : colors.ink} size={20} fill={hasProgram ? colors.fg : colors.ink} />}
+            onPress={() => begin()}
+          />
         </View>
       )}
 

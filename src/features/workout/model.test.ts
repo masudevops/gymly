@@ -31,6 +31,28 @@ describe('startWorkout', () => {
   });
 });
 
+describe('program sessions', () => {
+  it('carries the program context into the save payload and pre-fills timed targets as seconds', () => {
+    const w = M.startWorkout(new Date(), {
+      id: null,
+      name: 'Day A',
+      program: { enrollmentId: 'enr-1', programDayId: 'day-1', label: 'Week 1 · Day A' },
+      exercises: [
+        { exercise: bench, targetSets: 2, targetRepsMin: 8, restSeconds: 90 },
+        { exercise: plank, targetSets: 1, targetRepsMin: 40, restSeconds: 45 },
+      ],
+    });
+    expect(w.templateId).toBeNull();
+    expect(w.exercises[1].sets[0]).toMatchObject({ durationSeconds: 40, reps: null });
+    const p = M.toSavePayload(w);
+    expect(p).toMatchObject({ enrollment_id: 'enr-1', program_day_id: 'day-1', template_id: null });
+  });
+
+  it('sends null program fields for normal workouts', () => {
+    expect(M.toSavePayload(M.startWorkout())).toMatchObject({ enrollment_id: null, program_day_id: null });
+  });
+});
+
 describe('editing', () => {
   it('adds a set pre-filled from the previous one, not marked done', () => {
     let w = M.addExercises(M.startWorkout(), [bench]);

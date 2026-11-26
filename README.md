@@ -47,6 +47,6 @@ supabase/         local Supabase config, migrations and seed data
 - **Phase 0** ✅ Project setup, design system, navigation, CI
 - **Phase 1** ✅ Auth & onboarding, exercise library, workout logging (offline-safe), templates, history
 - **Phase 2** ✅ Progress & stats: PRs (with in-workout PR detection), per-exercise charts, weekly sets per muscle, consistency calendar and streaks, body weight
-- **Phase 3** Programs: multi-week plans and today's workout
+- **Phase 3** ✅ Programs: 4 built-in multi-week plans, session-based "up next", automatic completion
 - **Phase 4** Polish, web deploy, hosted Supabase
 - Later: iOS/Android store releases, Apple/Google sign-in, HealthKit/Google Fit, nutrition, premium tier

@@ -71,18 +71,3 @@ export function Button({
     </Pressable>
   );
 }
-
-/** Placeholder block for screens that are scheduled in later phases. */
-export function ComingSoon({ title, description, phase }: { title: string; description: string; phase: string }) {
-  return (
-    <Card className="mt-6 items-start gap-2">
-      <View className="rounded-full bg-iris/15 px-3 py-1">
-        <AppText variant="caption" className="font-semibold text-iris">
-          {phase}
-        </AppText>
-      </View>
-      <AppText variant="heading">{title}</AppText>
-      <AppText variant="label">{description}</AppText>
-    </Card>
-  );
-}
