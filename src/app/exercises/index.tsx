@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Check, Plus, Search } from 'lucide-react-native';
+import { Check, ChevronRight, Plus, Search } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,13 +13,12 @@ import { colors } from '@/theme/tokens';
 
 const MUSCLES = Object.keys(MUSCLE_LABELS) as MuscleGroup[];
 
-function ExerciseRow({ exercise, selected, onPress }: { exercise: Exercise; selected: boolean; onPress?: () => void }) {
+function ExerciseRow({ exercise, selected, picking, onPress }: { exercise: Exercise; selected: boolean; picking: boolean; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={!onPress}
-      accessibilityRole={onPress ? 'checkbox' : undefined}
-      aria-checked={onPress ? selected : undefined}
+      accessibilityRole={picking ? 'checkbox' : 'button'}
+      aria-checked={picking ? selected : undefined}
       className={cn('flex-row items-center gap-3 rounded-xl px-3 py-3', selected ? 'bg-volt/10' : 'active:bg-raised')}
     >
       <View className="h-11 w-11 items-center justify-center rounded-xl bg-raised">
@@ -32,10 +31,12 @@ function ExerciseRow({ exercise, selected, onPress }: { exercise: Exercise; sele
           {exercise.owner_id ? ' · Custom' : ''}
         </AppText>
       </View>
-      {onPress && (
+      {picking ? (
         <View className={cn('h-6 w-6 items-center justify-center rounded-full border-2', selected ? 'border-volt bg-volt' : 'border-line')}>
           {selected && <Check color={colors.ink} size={14} strokeWidth={3} />}
         </View>
+      ) : (
+        <ChevronRight color={colors.faint} size={18} />
       )}
     </Pressable>
   );
@@ -98,7 +99,12 @@ export default function ExercisesScreen() {
             keyboardShouldPersistTaps="handled"
             contentContainerClassName="pb-28"
             renderItem={({ item }) => (
-              <ExerciseRow exercise={item} selected={selected.includes(item.id)} onPress={picking ? () => toggle(item.id) : undefined} />
+              <ExerciseRow
+                exercise={item}
+                selected={selected.includes(item.id)}
+                picking={picking}
+                onPress={picking ? () => toggle(item.id) : () => router.push(`/exercise/${item.id}`)}
+              />
             )}
             ListEmptyComponent={
               <EmptyState

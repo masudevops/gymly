@@ -39,14 +39,14 @@ export type Database = {
                   ]
                 },"exercises": {
                   Row: {
-                    "created_at": string,"equipment": Database["public"]['Enums']["equipment"],"id": string,"instructions": string | null,"kind": Database["public"]['Enums']["exercise_kind"],"name": string,"owner_id": string | null,"primary_muscle": Database["public"]['Enums']["muscle_group"],"secondary_muscles": (Database["public"]['Enums']["muscle_group"])[]
+                    "created_at": string,"equipment": Database["public"]['Enums']["equipment"],"form_tip": string | null,"id": string,"instructions": string | null,"kind": Database["public"]['Enums']["exercise_kind"],"name": string,"owner_id": string | null,"primary_muscle": Database["public"]['Enums']["muscle_group"],"secondary_muscles": (Database["public"]['Enums']["muscle_group"])[]
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"equipment": Database["public"]['Enums']["equipment"],"id"?: string,"instructions"?: string | null,"kind"?: Database["public"]['Enums']["exercise_kind"],"name": string,"owner_id"?: string | null,"primary_muscle": Database["public"]['Enums']["muscle_group"],"secondary_muscles"?: (Database["public"]['Enums']["muscle_group"])[]
+                    "created_at"?: string,"equipment": Database["public"]['Enums']["equipment"],"form_tip"?: string | null,"id"?: string,"instructions"?: string | null,"kind"?: Database["public"]['Enums']["exercise_kind"],"name": string,"owner_id"?: string | null,"primary_muscle": Database["public"]['Enums']["muscle_group"],"secondary_muscles"?: (Database["public"]['Enums']["muscle_group"])[]
                   }
                   Update: {
-                    "created_at"?: string,"equipment"?: Database["public"]['Enums']["equipment"],"id"?: string,"instructions"?: string | null,"kind"?: Database["public"]['Enums']["exercise_kind"],"name"?: string,"owner_id"?: string | null,"primary_muscle"?: Database["public"]['Enums']["muscle_group"],"secondary_muscles"?: (Database["public"]['Enums']["muscle_group"])[]
+                    "created_at"?: string,"equipment"?: Database["public"]['Enums']["equipment"],"form_tip"?: string | null,"id"?: string,"instructions"?: string | null,"kind"?: Database["public"]['Enums']["exercise_kind"],"name"?: string,"owner_id"?: string | null,"primary_muscle"?: Database["public"]['Enums']["muscle_group"],"secondary_muscles"?: (Database["public"]['Enums']["muscle_group"])[]
                   }
                   Relationships: [
                     
