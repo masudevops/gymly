@@ -65,6 +65,86 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"program_day_exercises": {
+                  Row: {
+                    "exercise_id": string,"id": string,"notes": string | null,"position": number,"program_day_id": string,"reps_max": number | null,"reps_min": number | null,"rest_seconds": number | null,"sets": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "exercise_id": string,"id"?: string,"notes"?: string | null,"position": number,"program_day_id": string,"reps_max"?: number | null,"reps_min"?: number | null,"rest_seconds"?: number | null,"sets": number
+                  }
+                  Update: {
+                    "exercise_id"?: string,"id"?: string,"notes"?: string | null,"position"?: number,"program_day_id"?: string,"reps_max"?: number | null,"reps_min"?: number | null,"rest_seconds"?: number | null,"sets"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "program_day_exercises_exercise_id_fkey"
+      columns: ["exercise_id"]
+isOneToOne: false
+      referencedRelation: "exercises"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "program_day_exercises_program_day_id_fkey"
+      columns: ["program_day_id"]
+isOneToOne: false
+      referencedRelation: "program_days"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"program_days": {
+                  Row: {
+                    "focus": string | null,"id": string,"name": string,"position": number,"program_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "focus"?: string | null,"id"?: string,"name": string,"position": number,"program_id": string
+                  }
+                  Update: {
+                    "focus"?: string | null,"id"?: string,"name"?: string,"position"?: number,"program_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "program_days_program_id_fkey"
+      columns: ["program_id"]
+isOneToOne: false
+      referencedRelation: "programs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"program_enrollments": {
+                  Row: {
+                    "ended_at": string | null,"id": string,"program_id": string,"started_at": string,"status": Database["public"]['Enums']["enrollment_status"],"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ended_at"?: string | null,"id"?: string,"program_id": string,"started_at"?: string,"status"?: Database["public"]['Enums']["enrollment_status"],"user_id"?: string
+                  }
+                  Update: {
+                    "ended_at"?: string | null,"id"?: string,"program_id"?: string,"started_at"?: string,"status"?: Database["public"]['Enums']["enrollment_status"],"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "program_enrollments_program_id_fkey"
+      columns: ["program_id"]
+isOneToOne: false
+      referencedRelation: "programs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"programs": {
+                  Row: {
+                    "created_at": string,"days_per_week": number,"description": string | null,"equipment_note": string | null,"goal": Database["public"]['Enums']["training_goal"],"id": string,"level": Database["public"]['Enums']["experience_level"],"name": string,"owner_id": string | null,"slug": string | null,"summary": string,"weeks": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"days_per_week": number,"description"?: string | null,"equipment_note"?: string | null,"goal": Database["public"]['Enums']["training_goal"],"id"?: string,"level": Database["public"]['Enums']["experience_level"],"name": string,"owner_id"?: string | null,"slug"?: string | null,"summary": string,"weeks": number
+                  }
+                  Update: {
+                    "created_at"?: string,"days_per_week"?: number,"description"?: string | null,"equipment_note"?: string | null,"goal"?: Database["public"]['Enums']["training_goal"],"id"?: string,"level"?: Database["public"]['Enums']["experience_level"],"name"?: string,"owner_id"?: string | null,"slug"?: string | null,"summary"?: string,"weeks"?: number
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"template_exercises": {
                   Row: {
                     "exercise_id": string,"id": string,"notes": string | null,"position": number,"rest_seconds": number | null,"target_reps_max": number | null,"target_reps_min": number | null,"target_sets": number,"template_id": string
@@ -153,17 +233,29 @@ isOneToOne: false
                   ]
                 },"workouts": {
                   Row: {
-                    "created_at": string,"finished_at": string,"id": string,"name": string,"notes": string | null,"started_at": string,"template_id": string | null,"user_id": string
+                    "created_at": string,"enrollment_id": string | null,"finished_at": string,"id": string,"name": string,"notes": string | null,"program_day_id": string | null,"started_at": string,"template_id": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"finished_at": string,"id"?: string,"name": string,"notes"?: string | null,"started_at": string,"template_id"?: string | null,"user_id"?: string
+                    "created_at"?: string,"enrollment_id"?: string | null,"finished_at": string,"id"?: string,"name": string,"notes"?: string | null,"program_day_id"?: string | null,"started_at": string,"template_id"?: string | null,"user_id"?: string
                   }
                   Update: {
-                    "created_at"?: string,"finished_at"?: string,"id"?: string,"name"?: string,"notes"?: string | null,"started_at"?: string,"template_id"?: string | null,"user_id"?: string
+                    "created_at"?: string,"enrollment_id"?: string | null,"finished_at"?: string,"id"?: string,"name"?: string,"notes"?: string | null,"program_day_id"?: string | null,"started_at"?: string,"template_id"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "workouts_enrollment_id_fkey"
+      columns: ["enrollment_id"]
+isOneToOne: false
+      referencedRelation: "program_enrollments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "workouts_program_day_id_fkey"
+      columns: ["program_day_id"]
+isOneToOne: false
+      referencedRelation: "program_days"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "workouts_template_id_fkey"
       columns: ["template_id"]
 isOneToOne: false
@@ -177,7 +269,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "delete_account":
+            "active_program":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "days_per_week": number,"enrollment_id": string,"last_session_at": string,"name": string,"next_day_id": string,"next_day_name": string,"next_week": number,"program_id": string,"sessions_done": number,"started_at": string,"total_sessions": number,"weeks": number
+            }[]
+                           },
+"delete_account":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "e1rm":
@@ -204,6 +301,9 @@ isOneToOne: false
 "save_workout":
 { Args: { "payload": Json }; Returns: string
                            },
+"start_program":
+{ Args: { "p_program_id": string }; Returns: string
+                           },
 "training_days":
 { Args: { "p_from": string,"p_tz": string }; Returns: {
               "day": string,"volume_kg": number,"workouts": number
@@ -221,7 +321,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "equipment": "barbell"|"dumbbell"|"machine"|"cable"|"bodyweight"|"kettlebell"|"band"|"smith_machine"|"other","exercise_kind": "weight_reps"|"reps_only"|"duration","experience_level": "beginner"|"intermediate"|"advanced","muscle_group": "chest"|"back"|"shoulders"|"biceps"|"triceps"|"forearms"|"quads"|"hamstrings"|"glutes"|"calves"|"core"|"full_body"|"cardio","training_goal": "strength"|"muscle"|"general_fitness"|"endurance","unit_system": "kg"|"lb"
+            "enrollment_status": "active"|"completed"|"abandoned","equipment": "barbell"|"dumbbell"|"machine"|"cable"|"bodyweight"|"kettlebell"|"band"|"smith_machine"|"other","exercise_kind": "weight_reps"|"reps_only"|"duration","experience_level": "beginner"|"intermediate"|"advanced","muscle_group": "chest"|"back"|"shoulders"|"biceps"|"triceps"|"forearms"|"quads"|"hamstrings"|"glutes"|"calves"|"core"|"full_body"|"cardio","training_goal": "strength"|"muscle"|"general_fitness"|"endurance","unit_system": "kg"|"lb"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -341,7 +441,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "equipment": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "kettlebell", "band", "smith_machine", "other"],"exercise_kind": ["weight_reps", "reps_only", "duration"],"experience_level": ["beginner", "intermediate", "advanced"],"muscle_group": ["chest", "back", "shoulders", "biceps", "triceps", "forearms", "quads", "hamstrings", "glutes", "calves", "core", "full_body", "cardio"],"training_goal": ["strength", "muscle", "general_fitness", "endurance"],"unit_system": ["kg", "lb"]
+            "enrollment_status": ["active", "completed", "abandoned"],"equipment": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "kettlebell", "band", "smith_machine", "other"],"exercise_kind": ["weight_reps", "reps_only", "duration"],"experience_level": ["beginner", "intermediate", "advanced"],"muscle_group": ["chest", "back", "shoulders", "biceps", "triceps", "forearms", "quads", "hamstrings", "glutes", "calves", "core", "full_body", "cardio"],"training_goal": ["strength", "muscle", "general_fitness", "endurance"],"unit_system": ["kg", "lb"]
           }
         }
 } as const

@@ -102,6 +102,11 @@ export default function WorkoutScreen() {
               placeholderTextColor={colors.faint}
               placeholder="Workout name"
             />
+            {active.program && (
+              <AppText variant="caption" className="-mt-3 font-semibold uppercase tracking-wider text-iris">
+                {active.program.label}
+              </AppText>
+            )}
 
             {active.exercises.length === 0 ? (
               <EmptyState

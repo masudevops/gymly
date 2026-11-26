@@ -23,11 +23,15 @@ export type WorkoutExercise = {
   sets: SetEntry[];
 };
 
+/** Set when the workout is a session of the user's active program. */
+export type ProgramContext = { enrollmentId: string; programDayId: string; label: string };
+
 export type ActiveWorkout = {
   id: string; // client-generated; becomes workouts.id (idempotent save)
   name: string;
   notes: string;
   templateId: string | null;
+  program?: ProgramContext | null;
   startedAt: string; // ISO
   exercises: WorkoutExercise[];
 };
@@ -35,8 +39,9 @@ export type ActiveWorkout = {
 export type ExerciseRef = { id: string; name: string; kind: ExerciseKind };
 
 export type TemplateSeed = {
-  id: string;
+  id: string | null; // null for program sessions (not a saved template)
   name: string;
+  program?: ProgramContext;
   exercises: { exercise: ExerciseRef; targetSets: number; targetRepsMin: number | null; restSeconds: number | null }[];
 };
 
@@ -75,6 +80,7 @@ export function startWorkout(now = new Date(), template?: TemplateSeed): ActiveW
     name: template?.name ?? defaultName(now),
     notes: '',
     templateId: template?.id ?? null,
+    program: template?.program ?? null,
     startedAt: now.toISOString(),
     exercises: (template?.exercises ?? []).map((t) => ({
       key: newKey(),
@@ -83,7 +89,10 @@ export function startWorkout(now = new Date(), template?: TemplateSeed): ActiveW
       kind: t.exercise.kind,
       notes: '',
       restSeconds: t.restSeconds,
-      sets: Array.from({ length: Math.max(1, t.targetSets) }, () => ({ ...emptySet(), reps: t.targetRepsMin })),
+      // Targets pre-fill reps (or seconds for timed exercises); weights come from "last time" hints.
+      sets: Array.from({ length: Math.max(1, t.targetSets) }, () =>
+        t.exercise.kind === 'duration' ? { ...emptySet(), durationSeconds: t.targetRepsMin } : { ...emptySet(), reps: t.targetRepsMin },
+      ),
     })),
   };
 }
@@ -175,6 +184,8 @@ export function toSavePayload(w: ActiveWorkout, finishedAt = new Date()) {
     name: w.name.trim() || 'Workout',
     notes: w.notes.trim() || null,
     template_id: w.templateId,
+    enrollment_id: w.program?.enrollmentId ?? null,
+    program_day_id: w.program?.programDayId ?? null,
     started_at: w.startedAt,
     finished_at: finishedAt.toISOString(),
     exercises,

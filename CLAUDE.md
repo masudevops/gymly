@@ -20,7 +20,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Auth gating via `Stack.Protected` in `src/app/_layout.tsx`: signed out → sign-in/up; no `onboarded_at` → onboarding; else app.
 - Active workout = pure model (`features/workout/model.ts`, unit-tested) + zustand store persisted to AsyncStorage. Finish moves it to `pendingSaves`; `usePendingSaveSync` pushes via the `save_workout` RPC (idempotent on the client-generated workout id), so offline workouts are never lost or duplicated.
 - DB functions: `save_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
-- Env: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (Claude can't read/write `.env.local`; the user fills it).
+- Env: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (Claude can't read/write `.env.local`; the user fills it). On Vercel, `scripts/build-web.js` maps the Supabase integration's public vars onto these names and refuses secret keys.
 
 ## Stats (Phase 2)
 - Stats are computed in Postgres (`exercise_history`, `personal_records`, `workout_prs`, `weekly_muscle_sets`, `training_days`), all security invoker. Day/week grouping takes the client's IANA timezone (`lib/dates.ts userTimeZone()`); weeks start Monday.
@@ -28,6 +28,12 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - All stats queries use `['stats', ...]` keys; saving/deleting a workout invalidates `['stats']`.
 - Charts: `components/charts.tsx` (react-native-svg). Keep SVG ids unique (`useId`) because web ids are global.
 - React Compiler lint: no `Date.now()`/`new Date()` reads in render bodies that must stay pure; capture once (e.g. `useState(() => Date.now())`).
+
+## Programs (Phase 3)
+- Built-in programs + their days/exercises live in migration `..._builtin_programs.sql` (JSON spec; idempotent on slug; unknown exercise names abort). Reference data goes in migrations, not `seed.sql` (seed only runs locally).
+- Progress is session-based: `active_program()` derives next day = sessions_done % days_per_week. One active enrollment per user (partial unique index); `start_program` abandons the current one.
+- Program sessions are normal workouts with `enrollment_id`/`program_day_id`; `save_workout` only links to the caller's own active enrollment and completes it after the final session.
+- Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
 
 ## Gotchas
 - Don't run the dev server with `CI=1` (no file watching; you'll test stale code). Use `npx expo start --web`.

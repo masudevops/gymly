@@ -63,6 +63,7 @@ function RootStack() {
         <Stack.Screen name="history/[id]" />
         <Stack.Screen name="exercise/[id]" />
         <Stack.Screen name="body-weight" />
+        <Stack.Screen name="programs/[id]" />
       </Stack.Protected>
     </Stack>
   );

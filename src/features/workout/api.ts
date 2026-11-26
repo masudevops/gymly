@@ -45,6 +45,7 @@ export function usePendingSaveSync() {
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['last-sets'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
+      queryClient.invalidateQueries({ queryKey: ['programs', 'active'] });
     } finally {
       running.current = false;
     }
