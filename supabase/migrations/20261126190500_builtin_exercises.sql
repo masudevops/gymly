@@ -1,0 +1,177 @@
+-- Built-in exercise library (owner_id null = visible to every user).
+-- Reference data lives in a migration (not seed.sql) so it reaches the hosted project too.
+-- Idempotent: skips names that already exist in the built-in library.
+
+insert into public.exercises (name, primary_muscle, secondary_muscles, equipment, kind)
+select v.name, v.primary_muscle::public.muscle_group, v.secondary_muscles::public.muscle_group[],
+       v.equipment::public.equipment, v.kind::public.exercise_kind
+from (values
+-- Chest
+('Barbell Bench Press', 'chest', '{triceps,shoulders}', 'barbell', 'weight_reps'),
+('Incline Barbell Bench Press', 'chest', '{shoulders,triceps}', 'barbell', 'weight_reps'),
+('Decline Barbell Bench Press', 'chest', '{triceps}', 'barbell', 'weight_reps'),
+('Dumbbell Bench Press', 'chest', '{triceps,shoulders}', 'dumbbell', 'weight_reps'),
+('Incline Dumbbell Press', 'chest', '{shoulders,triceps}', 'dumbbell', 'weight_reps'),
+('Dumbbell Fly', 'chest', '{shoulders}', 'dumbbell', 'weight_reps'),
+('Incline Dumbbell Fly', 'chest', '{shoulders}', 'dumbbell', 'weight_reps'),
+('Cable Crossover', 'chest', '{shoulders}', 'cable', 'weight_reps'),
+('Low-to-High Cable Fly', 'chest', '{shoulders}', 'cable', 'weight_reps'),
+('Machine Chest Press', 'chest', '{triceps,shoulders}', 'machine', 'weight_reps'),
+('Pec Deck', 'chest', '{}', 'machine', 'weight_reps'),
+('Smith Machine Bench Press', 'chest', '{triceps,shoulders}', 'smith_machine', 'weight_reps'),
+('Push-Up', 'chest', '{triceps,shoulders,core}', 'bodyweight', 'reps_only'),
+('Incline Push-Up', 'chest', '{triceps,shoulders}', 'bodyweight', 'reps_only'),
+('Decline Push-Up', 'chest', '{shoulders,triceps}', 'bodyweight', 'reps_only'),
+('Chest Dip', 'chest', '{triceps,shoulders}', 'bodyweight', 'reps_only'),
+
+-- Back
+('Deadlift', 'back', '{glutes,hamstrings,forearms}', 'barbell', 'weight_reps'),
+('Barbell Row', 'back', '{biceps,forearms}', 'barbell', 'weight_reps'),
+('Pendlay Row', 'back', '{biceps}', 'barbell', 'weight_reps'),
+('One-Arm Dumbbell Row', 'back', '{biceps}', 'dumbbell', 'weight_reps'),
+('Chest-Supported Dumbbell Row', 'back', '{biceps}', 'dumbbell', 'weight_reps'),
+('T-Bar Row', 'back', '{biceps}', 'barbell', 'weight_reps'),
+('Machine Row', 'back', '{biceps}', 'machine', 'weight_reps'),
+('Seated Cable Row', 'back', '{biceps}', 'cable', 'weight_reps'),
+('Lat Pulldown', 'back', '{biceps}', 'cable', 'weight_reps'),
+('Close-Grip Lat Pulldown', 'back', '{biceps}', 'cable', 'weight_reps'),
+('Straight-Arm Pulldown', 'back', '{}', 'cable', 'weight_reps'),
+('Pull-Up', 'back', '{biceps,forearms}', 'bodyweight', 'reps_only'),
+('Chin-Up', 'back', '{biceps}', 'bodyweight', 'reps_only'),
+('Weighted Pull-Up', 'back', '{biceps,forearms}', 'other', 'weight_reps'),
+('Inverted Row', 'back', '{biceps}', 'bodyweight', 'reps_only'),
+('Rack Pull', 'back', '{glutes,forearms}', 'barbell', 'weight_reps'),
+('Back Extension', 'back', '{glutes,hamstrings}', 'bodyweight', 'reps_only'),
+('Barbell Shrug', 'back', '{forearms}', 'barbell', 'weight_reps'),
+('Dumbbell Shrug', 'back', '{forearms}', 'dumbbell', 'weight_reps'),
+
+-- Shoulders
+('Overhead Press', 'shoulders', '{triceps,core}', 'barbell', 'weight_reps'),
+('Push Press', 'shoulders', '{triceps,quads}', 'barbell', 'weight_reps'),
+('Seated Dumbbell Shoulder Press', 'shoulders', '{triceps}', 'dumbbell', 'weight_reps'),
+('Arnold Press', 'shoulders', '{triceps}', 'dumbbell', 'weight_reps'),
+('Machine Shoulder Press', 'shoulders', '{triceps}', 'machine', 'weight_reps'),
+('Landmine Press', 'shoulders', '{chest,triceps}', 'barbell', 'weight_reps'),
+('Dumbbell Lateral Raise', 'shoulders', '{}', 'dumbbell', 'weight_reps'),
+('Cable Lateral Raise', 'shoulders', '{}', 'cable', 'weight_reps'),
+('Dumbbell Front Raise', 'shoulders', '{}', 'dumbbell', 'weight_reps'),
+('Rear Delt Fly', 'shoulders', '{back}', 'dumbbell', 'weight_reps'),
+('Reverse Pec Deck', 'shoulders', '{back}', 'machine', 'weight_reps'),
+('Face Pull', 'shoulders', '{back}', 'cable', 'weight_reps'),
+('Upright Row', 'shoulders', '{back,biceps}', 'barbell', 'weight_reps'),
+
+-- Biceps
+('Barbell Curl', 'biceps', '{forearms}', 'barbell', 'weight_reps'),
+('EZ-Bar Curl', 'biceps', '{forearms}', 'barbell', 'weight_reps'),
+('Dumbbell Curl', 'biceps', '{forearms}', 'dumbbell', 'weight_reps'),
+('Hammer Curl', 'biceps', '{forearms}', 'dumbbell', 'weight_reps'),
+('Incline Dumbbell Curl', 'biceps', '{}', 'dumbbell', 'weight_reps'),
+('Preacher Curl', 'biceps', '{}', 'barbell', 'weight_reps'),
+('Machine Preacher Curl', 'biceps', '{}', 'machine', 'weight_reps'),
+('Cable Curl', 'biceps', '{forearms}', 'cable', 'weight_reps'),
+('Concentration Curl', 'biceps', '{}', 'dumbbell', 'weight_reps'),
+
+-- Triceps
+('Close-Grip Bench Press', 'triceps', '{chest,shoulders}', 'barbell', 'weight_reps'),
+('Triceps Pushdown', 'triceps', '{}', 'cable', 'weight_reps'),
+('Rope Pushdown', 'triceps', '{}', 'cable', 'weight_reps'),
+('Overhead Cable Triceps Extension', 'triceps', '{}', 'cable', 'weight_reps'),
+('Skull Crusher', 'triceps', '{}', 'barbell', 'weight_reps'),
+('Dumbbell Overhead Triceps Extension', 'triceps', '{}', 'dumbbell', 'weight_reps'),
+('Triceps Kickback', 'triceps', '{}', 'dumbbell', 'weight_reps'),
+('Triceps Dip', 'triceps', '{chest,shoulders}', 'bodyweight', 'reps_only'),
+('Bench Dip', 'triceps', '{shoulders}', 'bodyweight', 'reps_only'),
+('Diamond Push-Up', 'triceps', '{chest}', 'bodyweight', 'reps_only'),
+
+-- Forearms
+('Wrist Curl', 'forearms', '{}', 'dumbbell', 'weight_reps'),
+('Reverse Wrist Curl', 'forearms', '{}', 'dumbbell', 'weight_reps'),
+('Reverse Curl', 'forearms', '{biceps}', 'barbell', 'weight_reps'),
+('Farmer''s Carry', 'forearms', '{back,core,full_body}', 'dumbbell', 'duration'),
+('Dead Hang', 'forearms', '{back}', 'bodyweight', 'duration'),
+
+-- Quads
+('Back Squat', 'quads', '{glutes,hamstrings,core}', 'barbell', 'weight_reps'),
+('Front Squat', 'quads', '{glutes,core}', 'barbell', 'weight_reps'),
+('Goblet Squat', 'quads', '{glutes,core}', 'dumbbell', 'weight_reps'),
+('Smith Machine Squat', 'quads', '{glutes}', 'smith_machine', 'weight_reps'),
+('Hack Squat', 'quads', '{glutes}', 'machine', 'weight_reps'),
+('Leg Press', 'quads', '{glutes,hamstrings}', 'machine', 'weight_reps'),
+('Leg Extension', 'quads', '{}', 'machine', 'weight_reps'),
+('Bulgarian Split Squat', 'quads', '{glutes,hamstrings}', 'dumbbell', 'weight_reps'),
+('Walking Lunge', 'quads', '{glutes,hamstrings}', 'dumbbell', 'weight_reps'),
+('Reverse Lunge', 'quads', '{glutes}', 'dumbbell', 'weight_reps'),
+('Step-Up', 'quads', '{glutes}', 'dumbbell', 'weight_reps'),
+('Bodyweight Squat', 'quads', '{glutes}', 'bodyweight', 'reps_only'),
+('Jump Squat', 'quads', '{glutes,calves}', 'bodyweight', 'reps_only'),
+('Wall Sit', 'quads', '{glutes}', 'bodyweight', 'duration'),
+
+-- Hamstrings
+('Romanian Deadlift', 'hamstrings', '{glutes,back}', 'barbell', 'weight_reps'),
+('Dumbbell Romanian Deadlift', 'hamstrings', '{glutes,back}', 'dumbbell', 'weight_reps'),
+('Single-Leg Romanian Deadlift', 'hamstrings', '{glutes,core}', 'dumbbell', 'weight_reps'),
+('Stiff-Leg Deadlift', 'hamstrings', '{glutes,back}', 'barbell', 'weight_reps'),
+('Good Morning', 'hamstrings', '{glutes,back}', 'barbell', 'weight_reps'),
+('Lying Leg Curl', 'hamstrings', '{calves}', 'machine', 'weight_reps'),
+('Seated Leg Curl', 'hamstrings', '{}', 'machine', 'weight_reps'),
+('Nordic Hamstring Curl', 'hamstrings', '{}', 'bodyweight', 'reps_only'),
+
+-- Glutes
+('Barbell Hip Thrust', 'glutes', '{hamstrings}', 'barbell', 'weight_reps'),
+('Glute Bridge', 'glutes', '{hamstrings}', 'bodyweight', 'reps_only'),
+('Sumo Deadlift', 'glutes', '{quads,hamstrings,back}', 'barbell', 'weight_reps'),
+('Cable Glute Kickback', 'glutes', '{hamstrings}', 'cable', 'weight_reps'),
+('Hip Abduction Machine', 'glutes', '{}', 'machine', 'weight_reps'),
+('Cable Pull-Through', 'glutes', '{hamstrings}', 'cable', 'weight_reps'),
+('Kettlebell Swing', 'glutes', '{hamstrings,core,full_body}', 'kettlebell', 'weight_reps'),
+
+-- Calves
+('Standing Calf Raise', 'calves', '{}', 'machine', 'weight_reps'),
+('Seated Calf Raise', 'calves', '{}', 'machine', 'weight_reps'),
+('Leg Press Calf Raise', 'calves', '{}', 'machine', 'weight_reps'),
+('Single-Leg Calf Raise', 'calves', '{}', 'bodyweight', 'reps_only'),
+
+-- Core
+('Plank', 'core', '{shoulders}', 'bodyweight', 'duration'),
+('Side Plank', 'core', '{}', 'bodyweight', 'duration'),
+('Hollow Hold', 'core', '{}', 'bodyweight', 'duration'),
+('Hanging Leg Raise', 'core', '{forearms}', 'bodyweight', 'reps_only'),
+('Hanging Knee Raise', 'core', '{forearms}', 'bodyweight', 'reps_only'),
+('Lying Leg Raise', 'core', '{}', 'bodyweight', 'reps_only'),
+('Cable Crunch', 'core', '{}', 'cable', 'weight_reps'),
+('Crunch', 'core', '{}', 'bodyweight', 'reps_only'),
+('Bicycle Crunch', 'core', '{}', 'bodyweight', 'reps_only'),
+('Sit-Up', 'core', '{}', 'bodyweight', 'reps_only'),
+('Decline Sit-Up', 'core', '{}', 'bodyweight', 'reps_only'),
+('Ab Wheel Rollout', 'core', '{shoulders}', 'other', 'reps_only'),
+('Russian Twist', 'core', '{}', 'bodyweight', 'reps_only'),
+('Pallof Press', 'core', '{}', 'cable', 'weight_reps'),
+('Dead Bug', 'core', '{}', 'bodyweight', 'reps_only'),
+('Bird Dog', 'core', '{glutes}', 'bodyweight', 'reps_only'),
+('Mountain Climber', 'core', '{shoulders,cardio}', 'bodyweight', 'duration'),
+
+-- Full body
+('Power Clean', 'full_body', '{quads,glutes,back}', 'barbell', 'weight_reps'),
+('Hang Clean', 'full_body', '{quads,back}', 'barbell', 'weight_reps'),
+('Barbell Thruster', 'full_body', '{quads,shoulders}', 'barbell', 'weight_reps'),
+('Dumbbell Snatch', 'full_body', '{shoulders,glutes}', 'dumbbell', 'weight_reps'),
+('Turkish Get-Up', 'full_body', '{shoulders,core}', 'kettlebell', 'weight_reps'),
+('Burpee', 'full_body', '{chest,quads,cardio}', 'bodyweight', 'reps_only'),
+('Sled Push', 'full_body', '{quads,glutes}', 'other', 'duration'),
+('Battle Ropes', 'full_body', '{shoulders,cardio}', 'other', 'duration'),
+
+-- Cardio
+('Treadmill Run', 'cardio', '{}', 'machine', 'duration'),
+('Outdoor Run', 'cardio', '{}', 'bodyweight', 'duration'),
+('Walking', 'cardio', '{}', 'bodyweight', 'duration'),
+('Stationary Bike', 'cardio', '{}', 'machine', 'duration'),
+('Air Bike', 'cardio', '{full_body}', 'machine', 'duration'),
+('Rowing Machine', 'cardio', '{back,full_body}', 'machine', 'duration'),
+('Elliptical', 'cardio', '{}', 'machine', 'duration'),
+('Stair Climber', 'cardio', '{quads,glutes}', 'machine', 'duration'),
+('Jump Rope', 'cardio', '{calves}', 'other', 'duration'),
+('Swimming', 'cardio', '{full_body}', 'other', 'duration')
+) as v(name, primary_muscle, secondary_muscles, equipment, kind)
+where not exists (
+  select 1 from public.exercises e where e.owner_id is null and lower(e.name) = lower(v.name)
+);
