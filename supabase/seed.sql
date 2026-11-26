@@ -1,0 +1,2 @@
+-- Local development seed data (runs only on `supabase db reset` locally, never on the hosted project).
+-- The built-in exercise library is a migration: migrations/20261126190500_builtin_exercises.sql

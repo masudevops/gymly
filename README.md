@@ -12,7 +12,7 @@ A premium workout tracker: log training, follow programs and watch your strength
 ## Getting started
 ```bash
 npm install
-cp .env.example .env.local      # fill in values from `npx supabase status`
+cp .env.example .env.local      # set EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY (see below)
 npm run web                     # or: npm run ios / npm run android
 ```
 
@@ -20,8 +20,9 @@ Local database (needs a Docker runtime, e.g. Colima):
 ```bash
 colima start
 npx supabase start
-npx supabase status             # shows the local URL and anon key
+npx supabase status             # copy the "Publishable" key (sb_publishable_...) into .env.local
 ```
+The schema lives in `supabase/migrations/`; `supabase/seed.sql` loads the 140-exercise library.
 
 ## Scripts
 | Command | What it does |
@@ -34,16 +35,17 @@ npx supabase status             # shows the local URL and anon key
 
 ## Project layout
 ```
-src/app/          routes (Expo Router); (tabs)/ holds the main tab screens
-src/components/   shared UI (ui.tsx: Screen, AppText, Card, Button)
-src/lib/          logic and helpers (fitness.ts: units, e1RM, volume)
+src/app/          routes (Expo Router): (tabs)/ main tabs, workout, exercises/, templates/, history/, auth + onboarding
+src/features/     feature modules: auth, profile, exercises, workout (model, store, api, components), templates
+src/components/   shared UI (ui.tsx primitives, form.tsx inputs/header/empty states)
+src/lib/          helpers: supabase client, generated DB types, fitness math, formatting
 src/theme/        design tokens
 supabase/         local Supabase config, migrations and seed data
 ```
 
 ## Roadmap
 - **Phase 0** ✅ Project setup, design system, navigation, CI
-- **Phase 1** Auth & onboarding, exercise library, workout logging, templates, history
+- **Phase 1** ✅ Auth & onboarding, exercise library, workout logging (offline-safe), templates, history
 - **Phase 2** Progress & stats: PRs, charts, body weight, streaks
 - **Phase 3** Programs: multi-week plans and today's workout
 - **Phase 4** Polish, web deploy, hosted Supabase
