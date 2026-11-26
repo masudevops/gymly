@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import { Check, ChevronDown, ChevronUp, Minus, Plus, Timer, Trash2, X } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Check, ChevronDown, ChevronUp, Info, Minus, Plus, Timer, Trash2, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, TextInput, View } from 'react-native';
 
@@ -207,6 +208,9 @@ export function ExerciseCard({
         <AppText variant="heading" className="flex-1 text-volt" numberOfLines={1}>
           {exercise.name}
         </AppText>
+        <IconButton label={`How to do ${exercise.name}`} onPress={() => router.push(`/exercise/${exercise.exerciseId}`)}>
+          <Info color={colors.muted} size={18} />
+        </IconButton>
         <IconButton label="Move up" onPress={() => moveExercise(exercise.key, -1)} className={index === 0 ? 'opacity-30' : ''}>
           <ChevronUp color={colors.muted} size={20} />
         </IconButton>
