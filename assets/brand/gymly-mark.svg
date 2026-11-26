@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Gymly mark: a dumbbell on a volt tile, tilted for energy. Source of truth for all app icons. -->
+  <rect width="1024" height="1024" rx="232" fill="#D4FF3A"/>
+  <g transform="rotate(-35 512 512)" fill="#0B0B0F">
+    <rect x="300" y="476" width="424" height="72" rx="20"/>
+    <rect x="226" y="350" width="108" height="324" rx="44"/>
+    <rect x="690" y="350" width="108" height="324" rx="44"/>
+    <rect x="150" y="410" width="88" height="204" rx="36"/>
+    <rect x="786" y="410" width="88" height="204" rx="36"/>
+  </g>
+</svg>

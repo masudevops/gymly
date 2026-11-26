@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import { Link } from 'expo-router';
 import { Dumbbell } from 'lucide-react-native';
 import { useState } from 'react';
@@ -25,7 +26,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     if (password.length < 8) return setError('Password must be at least 8 characters.');
     setBusy(true);
     const creds = { email: email.trim().toLowerCase(), password };
-    const { data, error: err } = isSignUp ? await supabase.auth.signUp(creds) : await supabase.auth.signInWithPassword(creds);
+    // Confirmation links return to the site/app the user signed up from (must be in Supabase's Redirect URLs allow-list).
+    const emailRedirectTo = Platform.OS === 'web' ? window.location.origin : Linking.createURL('/');
+    const { data, error: err } = isSignUp
+      ? await supabase.auth.signUp({ ...creds, options: { emailRedirectTo } })
+      : await supabase.auth.signInWithPassword(creds);
     setBusy(false);
     if (err) return setError(err.message);
     // With email confirmation on (hosted projects), sign-up returns no session until the link is clicked.
@@ -63,6 +68,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             placeholder="At least 8 characters"
             onSubmitEditing={submit}
           />
+          {!isSignUp && (
+            <Link href="/forgot-password" className="self-end">
+              <AppText variant="label" className="text-volt">Forgot password?</AppText>
+            </Link>
+          )}
           {error && <ErrorNote message={error} />}
           {notice && <AppText variant="label" className="text-success">{notice}</AppText>}
           <Button title={busy ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'} onPress={submit} disabled={busy} className="mt-2" />

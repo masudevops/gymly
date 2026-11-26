@@ -35,12 +35,20 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Program sessions are normal workouts with `enrollment_id`/`program_day_id`; `save_workout` only links to the caller's own active enrollment and completes it after the final session.
 - Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
 
+## Deploy & ops
+- Hosted DB is linked (`supabase/.temp`). This CLI version targets **local** by default: use `--remote` (`db push --remote --dry-run` first; `db query --remote --read-only` for checks). Never print keys from `supabase status`/`projects api-keys`.
+- The CLI may assume agent mode (JSON output, no prompts); the user can pass `--agent no` in their own terminal.
+- Vercel env comes from the Supabase integration (Production only). A failed production build keeps the last good deploy live.
+- Icons are rendered from `assets/brand/gymly-mark.svg`; regenerate PNGs when the mark changes.
+
 ## Gotchas
 - Don't run the dev server with `CI=1` (no file watching; you'll test stale code). Use `npx expo start --web`.
 - Web: `<input>` has an intrinsic ~20ch width; inputs in flex rows need `min-w-0 basis-0`.
 - The `workout` screen must not auto-redirect when there's no active workout: Finish clears it, and a redirect raced the navigation to the summary. Finish uses `router.dismissTo('/')` then `push` (so Back from the summary lands on the tabs).
 - NativeWind needs `darkMode: 'class'` (set) or its web runtime throws.
 - `Alert` is a no-op on web; use `lib/confirm.ts`.
+- Web keeps previous stack screens mounted (hidden). In Playwright tests, target `input[...]:visible` or load the page directly.
+- Background dev servers die after their time limit; restart with a long timeout and check `curl localhost:8081` before browser tests.
 
 ## Conventions
 - UI primitives in `src/components/ui.tsx` (Screen, AppText variants, Card, Button). Use tokens/classes, never raw hex in screens.
