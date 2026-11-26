@@ -33,6 +33,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Built-in programs + their days/exercises live in migration `..._builtin_programs.sql` (JSON spec; idempotent on slug; unknown exercise names abort). Reference data goes in migrations, not `seed.sql` (seed only runs locally).
 - Progress is session-based: `active_program()` derives next day = sessions_done % days_per_week. One active enrollment per user (partial unique index); `start_program` abandons the current one.
 - Program sessions are normal workouts with `enrollment_id`/`program_day_id`; `save_workout` only links to the caller's own active enrollment and completes it after the final session.
+- Programs tab filters by days/week (`features/programs/recommend.ts`: default = nearest to onboarding `training_days`; "Recommended" = nearest experience level). Every count 3–6 should keep at least one plan.
 - Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
 
 ## Deploy & ops
@@ -47,6 +48,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - The `workout` screen must not auto-redirect when there's no active workout: Finish clears it, and a redirect raced the navigation to the summary. Finish uses `router.dismissTo('/')` then `push` (so Back from the summary lands on the tabs).
 - NativeWind needs `darkMode: 'class'` (set) or its web runtime throws.
 - `Alert` is a no-op on web; use `lib/confirm.ts`.
+- Accessibility state: use `aria-checked` / `aria-selected` props. React Native Web 0.21 ignores the old `accessibilityState`, so screen readers wouldn't announce selection.
 - Web keeps previous stack screens mounted (hidden). In Playwright tests, target `input[...]:visible` or load the page directly.
 - Background dev servers die after their time limit; restart with a long timeout and check `curl localhost:8081` before browser tests.
 

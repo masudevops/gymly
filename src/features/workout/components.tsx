@@ -154,7 +154,7 @@ function SetRow({
       )}
       <Pressable
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: set.done }}
+        aria-checked={set.done}
         accessibilityLabel={`Complete set ${index + 1}`}
         onPress={toggleDone}
         className={cn('h-11 w-11 items-center justify-center rounded-lg', set.done ? 'bg-success' : 'bg-raised active:bg-line')}

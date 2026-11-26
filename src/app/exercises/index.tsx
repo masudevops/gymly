@@ -19,7 +19,7 @@ function ExerciseRow({ exercise, selected, onPress }: { exercise: Exercise; sele
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? 'checkbox' : undefined}
-      accessibilityState={onPress ? { checked: selected } : undefined}
+      aria-checked={onPress ? selected : undefined}
       className={cn('flex-row items-center gap-3 rounded-xl px-3 py-3', selected ? 'bg-volt/10' : 'active:bg-raised')}
     >
       <View className="h-11 w-11 items-center justify-center rounded-xl bg-raised">

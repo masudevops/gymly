@@ -30,7 +30,7 @@ export function Chip({ label, selected, onPress }: { label: string; selected?: b
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      aria-selected={selected}
       onPress={onPress}
       className={cn('h-10 justify-center rounded-full border px-4', selected ? 'border-volt bg-volt' : 'border-line bg-surface active:bg-raised')}
     >
