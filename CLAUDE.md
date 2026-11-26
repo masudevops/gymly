@@ -22,6 +22,13 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - DB functions: `save_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
 - Env: `EXPO_PUBLIC_SUPABASE_URL` + `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (Claude can't read/write `.env.local`; the user fills it).
 
+## Stats (Phase 2)
+- Stats are computed in Postgres (`exercise_history`, `personal_records`, `workout_prs`, `weekly_muscle_sets`, `training_days`), all security invoker. Day/week grouping takes the client's IANA timezone (`lib/dates.ts userTimeZone()`); weeks start Monday.
+- `public.e1rm()` must stay in sync with `estimateOneRepMax` in `lib/fitness.ts` (Epley, 1–12 reps).
+- All stats queries use `['stats', ...]` keys; saving/deleting a workout invalidates `['stats']`.
+- Charts: `components/charts.tsx` (react-native-svg). Keep SVG ids unique (`useId`) because web ids are global.
+- React Compiler lint: no `Date.now()`/`new Date()` reads in render bodies that must stay pure; capture once (e.g. `useState(() => Date.now())`).
+
 ## Gotchas
 - Don't run the dev server with `CI=1` (no file watching; you'll test stale code). Use `npx expo start --web`.
 - Web: `<input>` has an intrinsic ~20ch width; inputs in flex rows need `min-w-0 basis-0`.

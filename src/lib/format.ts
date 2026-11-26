@@ -40,3 +40,8 @@ export function parseNumber(text: string): number | null {
   const n = Number(t);
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
+
+/** "1 set", "3 sets". */
+export function plural(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`;
+}

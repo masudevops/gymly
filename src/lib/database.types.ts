@@ -23,7 +23,21 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "exercises": {
+            "body_measurements": {
+                  Row: {
+                    "body_fat_pct": number | null,"created_at": string,"id": string,"measured_on": string,"notes": string | null,"user_id": string,"weight_kg": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body_fat_pct"?: number | null,"created_at"?: string,"id"?: string,"measured_on": string,"notes"?: string | null,"user_id"?: string,"weight_kg"?: number | null
+                  }
+                  Update: {
+                    "body_fat_pct"?: number | null,"created_at"?: string,"id"?: string,"measured_on"?: string,"notes"?: string | null,"user_id"?: string,"weight_kg"?: number | null
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"exercises": {
                   Row: {
                     "created_at": string,"equipment": Database["public"]['Enums']["equipment"],"id": string,"instructions": string | null,"kind": Database["public"]['Enums']["exercise_kind"],"name": string,"owner_id": string | null,"primary_muscle": Database["public"]['Enums']["muscle_group"],"secondary_muscles": (Database["public"]['Enums']["muscle_group"])[]
                   }
@@ -166,9 +180,22 @@ isOneToOne: false
             "delete_account":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"e1rm":
+{ Args: { "reps": number,"weight": number }; Returns: number
+                           },
+"exercise_history":
+{ Args: { "p_exercise_id": string }; Returns: {
+              "best_e1rm": number,"longest_seconds": number,"started_at": string,"top_reps": number,"top_weight_kg": number,"total_reps": number,"volume_kg": number,"working_sets": number,"workout_id": string
+            }[]
+                           },
 "last_sets_for_exercises":
 { Args: { "exercise_ids": (string)[] }; Returns: {
               "duration_seconds": number,"exercise_id": string,"is_warmup": boolean,"reps": number,"set_position": number,"weight_kg": number,"workout_started_at": string
+            }[]
+                           },
+"personal_records":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "best_e1rm": number,"best_e1rm_at": string,"exercise_id": string,"heaviest_kg": number,"kind": Database["public"]['Enums']["exercise_kind"],"last_done": string,"longest_seconds": number,"most_reps": number,"name": string,"primary_muscle": Database["public"]['Enums']["muscle_group"],"sessions": number
             }[]
                            },
 "save_template":
@@ -176,6 +203,21 @@ isOneToOne: false
                            },
 "save_workout":
 { Args: { "payload": Json }; Returns: string
+                           },
+"training_days":
+{ Args: { "p_from": string,"p_tz": string }; Returns: {
+              "day": string,"volume_kg": number,"workouts": number
+            }[]
+                           },
+"weekly_muscle_sets":
+{ Args: { "p_tz": string,"p_weeks": number }; Returns: {
+              "muscle": Database["public"]['Enums']["muscle_group"],"sets": number,"week_start": string
+            }[]
+                           },
+"workout_prs":
+{ Args: { "p_workout_id": string }; Returns: {
+              "exercise_id": string,"name": string,"previous": number,"record": string,"value": number
+            }[]
                            }
           }
           Enums: {

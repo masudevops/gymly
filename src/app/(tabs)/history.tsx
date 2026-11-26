@@ -8,7 +8,7 @@ import { AppText, Button } from '@/components/ui';
 import { useUnit } from '@/features/profile/api';
 import { useWorkoutHistory, type WorkoutSummary } from '@/features/workout/api';
 import { totalVolume } from '@/lib/fitness';
-import { formatDate, formatDuration, formatVolume } from '@/lib/format';
+import { formatDate, formatDuration, formatVolume, plural } from '@/lib/format';
 import { colors } from '@/theme/tokens';
 
 function WorkoutRow({ w, unit }: { w: WorkoutSummary; unit: 'kg' | 'lb' }) {
@@ -29,7 +29,7 @@ function WorkoutRow({ w, unit }: { w: WorkoutSummary; unit: 'kg' | 'lb' }) {
         {w.workout_exercises.map((e) => `${e.workout_sets.length}× ${e.exercise?.name ?? 'Exercise'}`).join('  ·  ')}
       </AppText>
       <View className="mt-3 flex-row gap-4">
-        <AppText variant="caption" className="text-fg">{sets.length} sets</AppText>
+        <AppText variant="caption" className="text-fg">{plural(sets.length, 'set')}</AppText>
         {volume > 0 && <AppText variant="caption" className="text-fg">{formatVolume(volume, unit)}</AppText>}
       </View>
     </Pressable>

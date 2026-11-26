@@ -44,6 +44,7 @@ export function usePendingSaveSync() {
       }
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['last-sets'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     } finally {
       running.current = false;
     }
@@ -118,6 +119,7 @@ export function useDeleteWorkout() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
       queryClient.invalidateQueries({ queryKey: ['last-sets'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });
 }
