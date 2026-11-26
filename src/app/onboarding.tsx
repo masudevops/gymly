@@ -30,7 +30,7 @@ function Option({ title, body, selected, onPress }: { title: string; body?: stri
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      aria-checked={selected}
       onPress={onPress}
       className={cn('flex-row items-center gap-4 rounded-2xl border p-4', selected ? 'border-volt bg-volt/10' : 'border-line bg-surface active:bg-raised')}
     >
@@ -88,7 +88,7 @@ export default function OnboardingScreen() {
             <Pressable
               key={d}
               accessibilityRole="radio"
-              accessibilityState={{ selected: days === d }}
+              aria-checked={days === d}
               onPress={() => setDays(d)}
               className={cn('h-16 w-16 items-center justify-center rounded-2xl border', days === d ? 'border-volt bg-volt' : 'border-line bg-surface')}
             >
