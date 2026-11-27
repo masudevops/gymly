@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Production web build (used by Vercel). Expo only inlines EXPO_PUBLIC_* variables, but the
 // Supabase <-> Vercel integration provides its own names (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_ANON_KEY, ...).
-// Map the first available PUBLIC value onto the names the app reads, then run `expo export`.
+// Map the first available PUBLIC value onto the names the app reads, run `expo export`, then add SEO files.
 // Only the project URL and the publishable/anon key are ever mapped: never the service role key.
 const { spawnSync } = require('node:child_process');
+
+const { resolveSiteUrl, writeSeoFiles } = require('./seo');
 
 const env = process.env;
 const pick = (...names) => names.map((n) => [n, env[n]]).find(([, v]) => v && v.trim());
@@ -36,4 +38,9 @@ const result = spawnSync('npx', ['expo', 'export', '--platform', 'web'], {
   stdio: 'inherit',
   env: { ...env, EXPO_PUBLIC_SUPABASE_URL: url[1], EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: key[1] },
 });
-process.exit(result.status ?? 1);
+if (result.status !== 0) process.exit(result.status ?? 1);
+
+// Canonical/Open Graph URLs, per-page tags, sitemap.xml and robots.txt (see scripts/seo.js).
+const siteUrl = resolveSiteUrl();
+writeSeoFiles('dist', siteUrl);
+console.log(`build-web: SEO files written for ${siteUrl}`);

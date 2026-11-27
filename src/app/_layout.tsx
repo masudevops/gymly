@@ -57,6 +57,9 @@ function RootStack() {
       </Stack.Protected>
       {/* Opened from the reset email, which creates a recovery session, so it must work in any auth state. */}
       <Stack.Screen name="reset-password" options={{ title: 'New password · Gymly' }} />
+      {/* Public legal pages, reachable signed in or out. */}
+      <Stack.Screen name="privacy" options={{ title: 'Privacy Policy · Gymly' }} />
+      <Stack.Screen name="terms" options={{ title: 'Terms of Service · Gymly' }} />
       <Stack.Protected guard={signedIn && !onboarded} redirectTo={signedIn ? '/' : '/welcome'}>
         <Stack.Screen name="onboarding" options={{ title: 'Welcome · Gymly' }} />
       </Stack.Protected>
