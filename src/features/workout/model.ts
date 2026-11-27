@@ -1,5 +1,6 @@
 // Pure, framework-free model of an in-progress workout. All weights in kg.
 // The zustand store (store.ts) wraps these functions; tests cover them directly.
+import type { Progression } from './overload';
 
 export type ExerciseKind = 'weight_reps' | 'reps_only' | 'duration';
 
@@ -20,6 +21,8 @@ export type WorkoutExercise = {
   kind: ExerciseKind;
   notes: string;
   restSeconds: number | null; // per-exercise override from a template
+  /** Rep range and equipment from a program day; drives progression hints. Absent outside program sessions. */
+  progression?: Progression | null;
   sets: SetEntry[];
 };
 
@@ -42,7 +45,7 @@ export type TemplateSeed = {
   id: string | null; // null for program sessions (not a saved template)
   name: string;
   program?: ProgramContext;
-  exercises: { exercise: ExerciseRef; targetSets: number; targetRepsMin: number | null; restSeconds: number | null }[];
+  exercises: { exercise: ExerciseRef; targetSets: number; targetRepsMin: number | null; restSeconds: number | null; progression?: Progression | null }[];
 };
 
 export const newKey = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
@@ -89,6 +92,7 @@ export function startWorkout(now = new Date(), template?: TemplateSeed): ActiveW
       kind: t.exercise.kind,
       notes: '',
       restSeconds: t.restSeconds,
+      progression: t.progression ?? null,
       // Targets pre-fill reps (or seconds for timed exercises); weights come from "last time" hints.
       sets: Array.from({ length: Math.max(1, t.targetSets) }, () =>
         t.exercise.kind === 'duration' ? { ...emptySet(), durationSeconds: t.targetRepsMin } : { ...emptySet(), reps: t.targetRepsMin },
@@ -135,6 +139,16 @@ export function addSet(w: ActiveWorkout, exKey: string): ActiveWorkout {
 
 export function updateSet(w: ActiveWorkout, exKey: string, setKey: string, patch: Partial<Omit<SetEntry, 'key'>>): ActiveWorkout {
   return mapExercise(w, exKey, (e) => ({ ...e, sets: e.sets.map((s) => (s.key === setKey ? { ...s, ...patch } : s)) }));
+}
+
+/** Applies a progression hint: fills weight and reps into working sets that aren't ticked yet. */
+export function applySuggestion(w: ActiveWorkout, exKey: string, values: { weightKg: number | null; reps: number }): ActiveWorkout {
+  return mapExercise(w, exKey, (e) => ({
+    ...e,
+    sets: e.sets.map((s) =>
+      s.done || s.isWarmup ? s : { ...s, reps: values.reps, weightKg: e.kind === 'weight_reps' && values.weightKg !== null ? values.weightKg : s.weightKg },
+    ),
+  }));
 }
 
 export function removeSet(w: ActiveWorkout, exKey: string, setKey: string): ActiveWorkout {

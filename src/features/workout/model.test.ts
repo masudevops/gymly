@@ -160,3 +160,29 @@ describe('editing saved workouts', () => {
     expect(p).not.toHaveProperty('started_at');
   });
 });
+
+describe('applySuggestion', () => {
+  it('fills weight and reps into unticked working sets only', () => {
+    let w = M.startWorkout(new Date(), { id: null, name: 'Day A', exercises: [{ exercise: bench, targetSets: 3, targetRepsMin: 8, restSeconds: null }] });
+    const ex = w.exercises[0];
+    w = M.updateSet(w, ex.key, ex.sets[0].key, { weightKg: 80, reps: 10, done: true });
+    w = M.updateSet(w, ex.key, ex.sets[1].key, { isWarmup: true, weightKg: 40 });
+    w = M.applySuggestion(w, ex.key, { weightKg: 82.5, reps: 8 });
+    expect(w.exercises[0].sets.map((s) => [s.weightKg, s.reps])).toEqual([[80, 10], [40, 8], [82.5, 8]]);
+  });
+
+  it('keeps weights untouched for a reps-only suggestion', () => {
+    let w = M.startWorkout(new Date(), { id: null, name: 'Day A', exercises: [{ exercise: pullup, targetSets: 2, targetRepsMin: 6, restSeconds: null }] });
+    w = M.applySuggestion(w, w.exercises[0].key, { weightKg: null, reps: 7 });
+    expect(w.exercises[0].sets.every((s) => s.reps === 7 && s.weightKg === null)).toBe(true);
+  });
+
+  it('carries a program rep range onto the session exercise', () => {
+    const w = M.startWorkout(new Date(), {
+      id: null,
+      name: 'Day A',
+      exercises: [{ exercise: bench, targetSets: 3, targetRepsMin: 8, restSeconds: null, progression: { repsMin: 8, repsMax: 10, equipment: 'barbell' } }],
+    });
+    expect(w.exercises[0].progression).toEqual({ repsMin: 8, repsMax: 10, equipment: 'barbell' });
+  });
+});

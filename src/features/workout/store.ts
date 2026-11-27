@@ -22,6 +22,7 @@ type WorkoutState = {
   addSet: (exKey: string) => void;
   updateSet: (exKey: string, setKey: string, patch: Partial<Omit<M.SetEntry, 'key'>>) => void;
   removeSet: (exKey: string, setKey: string) => void;
+  applySuggestion: (exKey: string, values: { weightKg: number | null; reps: number }) => void;
   startRest: (seconds: number) => void;
   adjustRest: (deltaSeconds: number) => void;
   stopRest: () => void;
@@ -52,6 +53,7 @@ export const useWorkoutStore = create<WorkoutState>()(
         addSet: (k) => edit((w) => M.addSet(w, k)),
         updateSet: (k, s, p) => edit((w) => M.updateSet(w, k, s, p)),
         removeSet: (k, s) => edit((w) => M.removeSet(w, k, s)),
+        applySuggestion: (k, v) => edit((w) => M.applySuggestion(w, k, v)),
 
         startRest: (seconds) => set({ rest: seconds > 0 ? { endsAt: Date.now() + seconds * 1000, totalSeconds: seconds } : null }),
         adjustRest: (delta) => {

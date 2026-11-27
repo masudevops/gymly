@@ -7,9 +7,10 @@ import { EmptyState, IconButton } from '@/components/form';
 import { AppText, Button } from '@/components/ui';
 import { useExercisePicker } from '@/features/exercises/picker';
 import { useProfile } from '@/features/profile/api';
-import { useLastSets } from '@/features/workout/api';
+import { useLastSets, useRecentSessions } from '@/features/workout/api';
 import { ExerciseCard, RestTimerBar, useNow } from '@/features/workout/components';
 import { isSetComplete, workoutStats } from '@/features/workout/model';
+import { overloadHint } from '@/features/workout/overload';
 import { useWorkoutStore } from '@/features/workout/store';
 import { confirm } from '@/lib/confirm';
 import { formatClock, formatVolume, plural } from '@/lib/format';
@@ -26,6 +27,9 @@ export default function WorkoutScreen() {
   const unit = profile?.unit ?? 'kg';
   const now = useNow();
   const lastSets = useLastSets(active?.exercises.map((e) => e.exerciseId) ?? []);
+  // Progression hints: program sessions only (they carry a rep range), and only with the Profile switch on.
+  const hintsOn = (profile?.progression_hints ?? false) && !!active?.program;
+  const recent = useRecentSessions(active?.exercises.filter((e) => e.progression).map((e) => e.exerciseId) ?? [], hintsOn);
   // Nothing in progress (finished elsewhere, or a stale link). No auto-redirect: on web the screen can
   // re-render mid-transition after Finish, and a redirect here would race the navigation to the summary.
   if (!active) {
@@ -122,6 +126,7 @@ export default function WorkoutScreen() {
                   index={i}
                   total={active.exercises.length}
                   previous={lastSets.data?.[e.exerciseId]}
+                  hint={hintsOn && e.progression ? overloadHint(e.kind, e.progression, recent.data?.[e.exerciseId] ?? [], unit) : null}
                   unit={unit}
                   defaultRest={profile?.rest_seconds ?? 90}
                 />
