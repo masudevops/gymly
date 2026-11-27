@@ -16,7 +16,6 @@ import { LoggerPreview, PhoneFrame, ProgramPreview, ProgressPreview } from './pr
 
 /** Same breakpoint as the app's sidebar layout. */
 const DESKTOP_MIN_WIDTH = 1024;
-const FEEDBACK_URL = 'https://github.com/masudevops/gymly/issues';
 const YEAR = new Date().getFullYear();
 
 const SUBHEAD = 'Your workouts. Your progress. Your journey. All in one place.';
@@ -263,9 +262,6 @@ function Footer({ onAbout }: { onAbout: () => void }) {
         <Pressable accessibilityRole="link" onPress={onAbout}>
           <AppText variant="label">About</AppText>
         </Pressable>
-        <Link href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">
-          <AppText variant="label">Feedback</AppText>
-        </Link>
       </View>
     </View>
   );
