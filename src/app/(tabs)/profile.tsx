@@ -7,18 +7,22 @@ import {
   CloudCheck,
   CloudUpload,
   Download,
+  FileText,
   Flame,
   Info,
   LogOut,
+  Mail,
   Pencil,
   Ruler,
+  Share2,
+  ShieldCheck,
   Target,
   Timer,
   UserCog,
   type LucideIcon,
 } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, Pressable, View } from 'react-native';
 
 import { ErrorNote, Loading, Segmented, Stepper } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
@@ -31,6 +35,7 @@ import { cn } from '@/lib/cn';
 import { confirm } from '@/lib/confirm';
 import { toDay } from '@/lib/dates';
 import { formatClock, plural } from '@/lib/format';
+import { SUPPORT_EMAIL } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/tokens';
 
@@ -129,6 +134,18 @@ export default function ProfileScreen() {
             <ExportRow unit={p.unit} />
           </>
         )}
+        <Divider />
+        {Platform.OS === 'web' && (
+          <>
+            <ShareRow />
+            <Divider />
+          </>
+        )}
+        <Row icon={Mail} title="Contact support" subtitle={SUPPORT_EMAIL} onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)} />
+        <Divider />
+        <Row icon={ShieldCheck} title="Privacy Policy" onPress={() => router.push('/privacy')} />
+        <Divider />
+        <Row icon={FileText} title="Terms of Service" onPress={() => router.push('/terms')} />
         <Divider />
         <Row icon={Info} title="About Gymly">
           <AppText variant="label">v{Constants.expoConfig?.version ?? '1.0.0'}</AppText>
@@ -238,6 +255,30 @@ function Divider() {
 }
 
 /** Settings row: icon, title/subtitle, then a control (children) or a chevron when it navigates. */
+/**
+ * Shares the public homepage, never the current route: a link to an app screen would make Safari and
+ * Messages preview whatever is on screen (names, stats) instead of the branded card.
+ */
+function ShareRow() {
+  const [copied, setCopied] = useState(false);
+  const share = async () => {
+    const url = `${window.location.origin}/`;
+    if (typeof navigator.share === 'function') {
+      // Rejects when the user closes the share sheet; nothing to do then.
+      await navigator.share({ title: 'Gymly', text: 'Train smarter. Get stronger.', url }).catch(() => {});
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Clipboard blocked (insecure context or permissions); the row simply does nothing.
+    }
+  };
+  return <Row icon={Share2} title="Share Gymly" subtitle={copied ? 'Link copied' : 'Invite a friend to train with you'} onPress={share} />;
+}
+
 function Row({ icon: Icon, title, subtitle, onPress, children, danger }: {
   icon: LucideIcon;
   title: string;

@@ -77,6 +77,14 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           {error && <ErrorNote message={error} />}
           {notice && <AppText variant="label" className="text-success">{notice}</AppText>}
           <Button title={busy ? 'Please wait…' : isSignUp ? 'Create account' : 'Sign in'} onPress={submit} disabled={busy} className="mt-2" />
+          {isSignUp && (
+            <AppText variant="caption" className="text-center">
+              By creating an account, you agree to our{' '}
+              <Link href="/terms"><AppText variant="caption" className="text-volt">Terms of Service</AppText></Link>
+              {' '}and{' '}
+              <Link href="/privacy"><AppText variant="caption" className="text-volt">Privacy Policy</AppText></Link>.
+            </AppText>
+          )}
         </View>
 
         <View className="mt-8 flex-row justify-center gap-1">

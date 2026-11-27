@@ -43,7 +43,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 
 ## Landing & motivation
 - `/welcome` is the first screen of the signed-out group; signed-out `/`, sign-out and account deletion land there. Previews in `features/landing/previews.tsx` are recreations from tokens with example data, not screenshots. Only advertise features that exist.
-- Brand mark in JS: `components/brand-mark.tsx` (keep in sync with `assets/brand/gymly-mark.svg`). SEO/OG tags live in `public/index.html` (single-page output, so they're static); `public/og.png` is 1200×630.
+- Brand mark in JS: `components/brand-mark.tsx` (keep in sync with `assets/brand/gymly-mark.svg`). SEO/OG tags live in `public/index.html` (single-page output, so they're static); `public/og-image.png` is the 1200×630 share card (logo + wordmark only, no screenshots or text beyond the name). `og:title` stays brand-free (brand is `og:site_name`). PWA icons: `icon-*` = rounded tile (purpose any), `maskable-*` = full-bleed. Profile's Share row shares the homepage URL, never the current route (Safari/Messages would otherwise preview the on-screen page).
 - Daily quotes: `features/motivation/quotes.ts` (original lines per context, rotate at local midnight, unit-tested) rendered by `<DailyQuote context>`. Keep them short and unattributed; never during an active workout.
 
 ## Profile & account
@@ -56,6 +56,9 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Hosted DB is linked (`supabase/.temp`). This CLI version targets **local** by default: use `--remote` (`db push --remote --dry-run` first; `db query --remote --read-only` for checks). Never print keys from `supabase status`/`projects api-keys`.
 - The CLI may assume agent mode (JSON output, no prompts); the user can pass `--agent no` in their own terminal.
 - Vercel env comes from the Supabase integration (Production only). A failed production build keeps the last good deploy live.
+- Domain: **https://mygymly.com** (registrar + DNS on Cloudflare, records must stay **DNS only**/grey cloud; `www` 308-redirects to the apex in Vercel's domain settings). `gymly-omega.vercel.app` still works. Supabase Auth Site URL is `https://mygymly.com`; keep `https://mygymly.com/**`, the vercel.app URLs, `http://localhost:8081/**` and `gymly://**` in Redirect URLs.
+- No hardcoded site URL: auth redirects use `window.location.origin`; SEO tags in `public/index.html` use `%SITE_URL%`, filled by `scripts/seo.js` during `build-web.js` (`SITE_URL` → Vercel's `VERCEL_PROJECT_PRODUCTION_URL` → localhost). It also writes per-page shells (`dist/<page>/index.html`) for public pages, `sitemap.xml` and `robots.txt`; add new public pages to `PAGES` there.
+- Legal: `/privacy` and `/terms` (`features/legal/content.ts`) are public in any auth state. Keep them accurate to real data handling and bump the effective date when they change. Contact is `SUPPORT_EMAIL` in `lib/site.ts` (support@mygymly.com via Cloudflare Email Routing). No operator name or governing-law clause by owner's choice.
 - Icons are rendered from `assets/brand/gymly-mark.svg`; regenerate PNGs when the mark changes.
 
 ## Gotchas

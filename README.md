@@ -25,7 +25,7 @@ npx supabase status             # copy the "Publishable" key (sb_publishable_...
 The schema lives in `supabase/migrations/`; `supabase/seed.sql` loads the 140-exercise library.
 
 ## Deployment
-- **Web:** Vercel builds `main` with `node scripts/build-web.js` (maps the Supabase integration's public env vars onto `EXPO_PUBLIC_*`). Live at https://gymly-omega.vercel.app
+- **Web:** Vercel builds `main` with `node scripts/build-web.js` (maps the Supabase integration's public env vars onto `EXPO_PUBLIC_*`). Live at https://mygymly.com (custom domain on Vercel, DNS on Cloudflare)
 - **Database:** hosted Supabase project `vqdldvfucnunuihnytvv`. Apply new migrations with `npx supabase db push --remote` (preview first with `--dry-run`).
 - **Auth URLs:** Supabase → Authentication → URL Configuration must list the site URL and `http://localhost:8081/**`.
 

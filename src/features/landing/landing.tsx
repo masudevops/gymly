@@ -262,6 +262,12 @@ function Footer({ onAbout }: { onAbout: () => void }) {
         <Pressable accessibilityRole="link" onPress={onAbout}>
           <AppText variant="label">About</AppText>
         </Pressable>
+        <Link href="/privacy">
+          <AppText variant="label">Privacy</AppText>
+        </Link>
+        <Link href="/terms">
+          <AppText variant="label">Terms</AppText>
+        </Link>
       </View>
     </View>
   );
