@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Minus, Plus } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, Text, TextInput, View, type TextInputProps } from 'react-native';
 
@@ -50,6 +50,51 @@ export function IconButton({ onPress, label, children, className }: { onPress: (
     >
       {children}
     </Pressable>
+  );
+}
+
+/** Two-or-more option toggle (e.g. kg / lb). Announced as a radio group. */
+export function Segmented<T extends string>({ options, value, onChange, label }: { options: { value: T; label: string }[]; value: T; onChange: (v: T) => void; label: string }) {
+  return (
+    <View accessibilityRole="radiogroup" accessibilityLabel={label} className="flex-row rounded-full border border-line bg-raised p-1">
+      {options.map((o) => {
+        const selected = o.value === value;
+        return (
+          <Pressable
+            key={o.value}
+            accessibilityRole="radio"
+            aria-checked={selected}
+            onPress={() => !selected && onChange(o.value)}
+            className={cn('h-10 justify-center rounded-full px-3.5', selected ? 'bg-volt' : 'active:bg-surface')}
+          >
+            <Text className={cn('font-semibold text-sm', selected ? 'text-ink' : 'text-muted')}>{o.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Minus / value / plus control for small numeric settings. */
+export function Stepper({ value, onDecrement, onIncrement, decrementLabel, incrementLabel, canDecrement = true, canIncrement = true }: {
+  value: string;
+  onDecrement: () => void;
+  onIncrement: () => void;
+  decrementLabel: string;
+  incrementLabel: string;
+  canDecrement?: boolean;
+  canIncrement?: boolean;
+}) {
+  return (
+    <View className="flex-row items-center gap-1">
+      <IconButton label={decrementLabel} onPress={() => canDecrement && onDecrement()} className={cn('bg-raised', !canDecrement && 'opacity-40')}>
+        <Minus color={colors.fg} size={18} />
+      </IconButton>
+      <AppText variant="heading" className="min-w-[48px] text-center">{value}</AppText>
+      <IconButton label={incrementLabel} onPress={() => canIncrement && onIncrement()} className={cn('bg-raised', !canIncrement && 'opacity-40')}>
+        <Plus color={colors.fg} size={18} />
+      </IconButton>
+    </View>
   );
 }
 

@@ -69,6 +69,8 @@ function RootStack() {
         <Stack.Screen name="exercise/[id]" />
         <Stack.Screen name="body-weight" />
         <Stack.Screen name="programs/[id]" />
+        <Stack.Screen name="settings/edit-profile" options={{ title: 'Edit profile · Gymly' }} />
+        <Stack.Screen name="settings/account" options={{ title: 'Account · Gymly' }} />
       </Stack.Protected>
     </Stack>
   );

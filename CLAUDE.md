@@ -37,6 +37,12 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Programs tab filters by days/week (`features/programs/recommend.ts`: default = nearest to onboarding `training_days`; "Recommended" = nearest experience level). Every count 3–6 should keep at least one plan.
 - Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
 
+## Profile & account
+- Avatars: private `avatars` bucket, path `{user_id}/{uuid}.ext` (RLS on `storage.objects` by first folder), shown via signed URLs (`useAvatarUrl`). `profiles.avatar_path` must start with the user's id.
+- Stats header uses `profile_summary(tz)` (security invoker, under `['stats']`).
+- Account deletion lives in `/settings/account` (type DELETE + confirm). `deleteAccount()` empties the user's avatar folder first because Storage doesn't cascade from `auth.users`.
+- Export (CSV of every set) is web only; native needs `expo-file-system` + `expo-sharing`.
+
 ## Deploy & ops
 - Hosted DB is linked (`supabase/.temp`). This CLI version targets **local** by default: use `--remote` (`db push --remote --dry-run` first; `db query --remote --read-only` for checks). Never print keys from `supabase status`/`projects api-keys`.
 - The CLI may assume agent mode (JSON output, no prompts); the user can pass `--agent no` in their own terminal.

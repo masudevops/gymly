@@ -26,6 +26,8 @@ test('password reset via email, then sign in with the new password', async ({ pa
   await tap(page, 'Continue');
   await tap(page, 'Profile');
   await tap(page, 'Sign out');
+  // Wait for sign-out to finish; navigating mid-request aborts the logout and keeps the session.
+  await expect(visibleText(page, 'Forgot password?')).toBeVisible();
   await page.goto('/sign-in');
   await input(page, 'you@example.com').fill(email);
   await input(page, 'At least 8 characters').fill('NewPass456!');
