@@ -47,10 +47,10 @@ test('the share icon on app tabs shares the homepage, not the tab the user is on
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.addInitScript(() => Object.defineProperty(navigator, 'share', { value: undefined }));
   await signUp(page, 'share-tab');
-  await tap(page, 'History');
-  await expect(page).toHaveURL(/\/history$/);
-  // Inactive tabs stay mounted; the last match is the active tab's icon (same convention as tap()).
-  await page.getByRole('button', { name: 'Share Gymly' }).filter({ visible: true }).last().click();
-  await expect(page.getByRole('button', { name: 'Link copied' }).filter({ visible: true }).last()).toBeVisible();
+  // Load the tab directly so it's the only one mounted (inactive tabs stay in the DOM on web).
+  await page.goto('/history');
+  await expect(visibleText(page, 'History')).toBeVisible();
+  await page.getByRole('button', { name: 'Share Gymly' }).click();
+  await expect(page.getByRole('button', { name: 'Link copied' })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(new URL('/', page.url()).toString());
 });
