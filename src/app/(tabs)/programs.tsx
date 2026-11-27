@@ -11,6 +11,7 @@ import { useActiveProgram, usePrograms } from '@/features/programs/api';
 import { FeaturedCard, ProgramCard } from '@/features/programs/components';
 import { availableDayCounts, defaultDayCount, recommendedProgramId, type Level } from '@/features/programs/recommend';
 import { UpNextCard } from '@/features/programs/up-next-card';
+import { TabTitle } from '@/features/share/share-gymly';
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
 
@@ -80,7 +81,7 @@ export default function ProgramsScreen() {
 
   return (
     <Screen>
-      <AppText variant="display">Programs</AppText>
+      <TabTitle title="Programs" />
       <DailyQuote context="programs" className="mt-1" />
 
       <UpNextCard className="mt-6" />
