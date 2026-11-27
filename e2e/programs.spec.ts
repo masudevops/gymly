@@ -8,7 +8,8 @@ test('programs: pick by days per week, start a plan, advance after a session', a
 
   await tap(page, 'Programs');
   await expect(visibleText(page, 'How many days a week can you train?')).toBeVisible();
-  await expect(page.locator('[role="radio"][aria-checked="true"]:visible')).toHaveAttribute('aria-label', '4 days per week');
+  const daysPicker = page.getByRole('radiogroup', { name: 'Days per week' }).filter({ visible: true });
+  await expect(daysPicker.locator('[role="radio"][aria-checked="true"]')).toHaveAttribute('aria-label', '4 days per week');
   await expect(visibleText(page, 'Recommended for you')).toBeVisible();
   await expect(visibleText(page, 'Upper / Lower Strength')).toBeVisible();
 

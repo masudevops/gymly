@@ -43,8 +43,10 @@ function ExerciseRow({ exercise, selected, picking, onPress }: { exercise: Exerc
 }
 
 export default function ExercisesScreen() {
+  // pick=1: multi-select and confirm; pick=one: tapping an exercise picks it (used to swap one exercise).
   const { pick } = useLocalSearchParams<{ pick?: string }>();
   const picking = pick === '1';
+  const pickingOne = pick === 'one';
   const { data, isPending, error } = useExercises();
   const onPick = useExercisePicker((s) => s.onPick);
   const clearPicker = useExercisePicker((s) => s.clear);
@@ -55,6 +57,12 @@ export default function ExercisesScreen() {
   const list = useMemo(() => filterExercises(data ?? [], query, muscle), [data, query, muscle]);
 
   const toggle = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const pickOne = (e: Exercise) => {
+    onPick?.([{ id: e.id, name: e.name, kind: e.kind }]);
+    clearPicker();
+    router.back();
+  };
 
   const confirmPick = () => {
     const byId = new Map((data ?? []).map((e) => [e.id, e]));
@@ -67,7 +75,7 @@ export default function ExercisesScreen() {
     <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-ink">
       <View className="w-full max-w-2xl flex-1 self-center px-5 pt-2">
         <Header
-          title={picking ? 'Add exercises' : 'Exercises'}
+          title={picking ? 'Add exercises' : pickingOne ? 'Choose a replacement' : 'Exercises'}
           right={
             <IconButton label="New exercise" onPress={() => router.push('/exercises/new')}>
               <Plus color={colors.volt} size={24} />
@@ -103,7 +111,7 @@ export default function ExercisesScreen() {
                 exercise={item}
                 selected={selected.includes(item.id)}
                 picking={picking}
-                onPress={picking ? () => toggle(item.id) : () => router.push(`/exercise/${item.id}`)}
+                onPress={picking ? () => toggle(item.id) : pickingOne ? () => pickOne(item) : () => router.push(`/exercise/${item.id}`)}
               />
             )}
             ListEmptyComponent={

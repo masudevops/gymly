@@ -1,7 +1,7 @@
 // Short, original motivational lines, grouped by where they appear. No attributions: these are Gymly's own.
 // The first line of each list is the one shown on day zero; keep lists short so they stay fresh but familiar.
 
-export type QuoteContext = 'landing' | 'sign-in' | 'sign-up' | 'train' | 'history' | 'progress' | 'workout-complete';
+export type QuoteContext = 'landing' | 'sign-in' | 'sign-up' | 'train' | 'history' | 'progress' | 'programs' | 'workout-complete';
 
 export const quotes: Record<QuoteContext, readonly string[]> = {
   landing: [
@@ -34,6 +34,11 @@ export const quotes: Record<QuoteContext, readonly string[]> = {
     'Progress, not perfection.',
     'Slow progress is still progress.',
     'Stronger than last month. That’s the goal.',
+  ],
+  programs: [
+    'Trust the process.',
+    'Plan the work. Work the plan.',
+    'Consistency compounds.',
   ],
   'workout-complete': [
     'Another workout. Another win.',
