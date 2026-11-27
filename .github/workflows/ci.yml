@@ -39,7 +39,9 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned: "latest" calls the GitHub releases API on every run and kept failing on rate limits.
+          # Keep in step with the local CLI (`npx supabase --version`).
+          version: 3.4.0
       - name: Start local Supabase (migrations applied on start)
         run: supabase start
       - name: Point the app at local Supabase
