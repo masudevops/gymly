@@ -1,11 +1,9 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import {
   CalendarDays,
   ChartNoAxesColumnIncreasing,
   ChevronRight,
-  CircleQuestionMark,
   CloudCheck,
   CloudUpload,
   Download,
@@ -35,8 +33,6 @@ import { toDay } from '@/lib/dates';
 import { formatClock, plural } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/tokens';
-
-const FEEDBACK_URL = 'https://github.com/masudevops/gymly/issues';
 
 export default function ProfileScreen() {
   const { session } = useAuth();
@@ -133,8 +129,6 @@ export default function ProfileScreen() {
             <ExportRow unit={p.unit} />
           </>
         )}
-        <Divider />
-        <Row icon={CircleQuestionMark} title="Help & feedback" subtitle="Report a problem or suggest an idea" onPress={() => WebBrowser.openBrowserAsync(FEEDBACK_URL)} />
         <Divider />
         <Row icon={Info} title="About Gymly">
           <AppText variant="label">v{Constants.expoConfig?.version ?? '1.0.0'}</AppText>
