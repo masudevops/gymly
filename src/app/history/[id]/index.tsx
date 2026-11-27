@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { ErrorNote, Header, IconButton, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
+import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useUnit } from '@/features/profile/api';
 import { useWorkoutPRs } from '@/features/progress/api';
 import { useDeleteWorkout, useWorkoutDetail } from '@/features/workout/api';
@@ -95,7 +96,7 @@ export default function WorkoutDetailScreen() {
           <PartyPopper color={colors.ink} size={24} />
           <View className="flex-1">
             <AppText variant="heading" className="text-ink">Workout complete</AppText>
-            <AppText variant="label" className="text-ink/70">Nice work. Rest up and come back stronger.</AppText>
+            <DailyQuote context="workout-complete" className="text-ink/70" />
           </View>
         </View>
       )}

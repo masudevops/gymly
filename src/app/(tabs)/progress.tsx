@@ -7,6 +7,7 @@ import { BarRow, LineChart } from '@/components/charts';
 import { EmptyState, ErrorNote, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
 import { MUSCLE_LABELS, type MuscleGroup } from '@/features/exercises/api';
+import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useProfile } from '@/features/profile/api';
 import { useBodyMeasurements, usePersonalRecords, useTrainingDays, useWeeklyMuscleSets } from '@/features/progress/api';
 import { cn } from '@/lib/cn';
@@ -114,6 +115,7 @@ export default function ProgressScreen() {
   return (
     <Screen>
       <AppText variant="display">Progress</AppText>
+      <DailyQuote context="progress" className="mt-1" />
 
       <View className="mt-6 flex-row gap-3">
         <StatTile label="This week" value={`${trainedThisWeek}/${target}`} sub="workouts" />

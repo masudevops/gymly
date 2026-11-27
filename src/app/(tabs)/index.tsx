@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { EmptyState, ErrorNote, IconButton, Loading } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
+import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useActiveProgram } from '@/features/programs/api';
 import { useProfile } from '@/features/profile/api';
 import { useTrainingDays } from '@/features/progress/api';
@@ -119,6 +120,7 @@ export default function TrainScreen() {
     <Screen>
       <AppText variant="label">{greeting(profile?.display_name)}</AppText>
       <AppText variant="display" className="mt-1">Train</AppText>
+      <DailyQuote context="train" className="mt-1" />
 
       <ActiveBanner />
       <ThisWeek target={profile?.training_days ?? 3} />

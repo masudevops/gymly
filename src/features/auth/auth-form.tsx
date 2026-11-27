@@ -1,13 +1,13 @@
 import * as Linking from 'expo-linking';
-import { Link } from 'expo-router';
-import { Dumbbell } from 'lucide-react-native';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
-import { ErrorNote, Field } from '@/components/form';
+import { BrandMark } from '@/components/brand-mark';
+import { ErrorNote, Field, Header } from '@/components/form';
 import { AppText, Button, Screen } from '@/components/ui';
+import { DailyQuote } from '@/features/motivation/daily-quote';
 import { supabase } from '@/lib/supabase';
-import { colors } from '@/theme/tokens';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -39,13 +39,14 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 bg-ink">
-      <Screen className="flex-1 justify-center">
+      <Screen className="flex-1">
+        <Header onBack={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} />
+        <View className="flex-1 justify-center">
         <View className="mb-10 items-center gap-3">
-          <View className="h-16 w-16 items-center justify-center rounded-2xl bg-volt">
-            <Dumbbell color={colors.ink} size={32} strokeWidth={2.4} />
-          </View>
+          <BrandMark size={64} />
           <AppText variant="display">Gymly</AppText>
           <AppText variant="label">{isSignUp ? 'Create your account' : 'Welcome back'}</AppText>
+          <DailyQuote context={isSignUp ? 'sign-up' : 'sign-in'} className="mt-1 text-center" />
         </View>
 
         <View className="gap-4">
@@ -85,6 +86,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               {isSignUp ? 'Sign in' : 'Create an account'}
             </AppText>
           </Link>
+        </View>
         </View>
       </Screen>
     </KeyboardAvoidingView>

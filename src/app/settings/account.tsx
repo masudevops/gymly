@@ -26,7 +26,7 @@ export default function AccountScreen() {
     setBusy(true);
     setError(null);
     try {
-      // Signing out at the end swaps the app to the sign-in screen.
+      // Signing out at the end swaps the app to the landing page.
       await deleteAccount(session.user.id);
     } catch {
       setError("Couldn't delete your account. Check your connection and try again.");
