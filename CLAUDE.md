@@ -34,7 +34,11 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Built-in programs + their days/exercises live in migration `..._builtin_programs.sql` (JSON spec; idempotent on slug; unknown exercise names abort). Reference data goes in migrations, not `seed.sql` (seed only runs locally).
 - Progress is session-based: `active_program()` derives next day = sessions_done % days_per_week. One active enrollment per user (partial unique index); `start_program` abandons the current one.
 - Program sessions are normal workouts with `enrollment_id`/`program_day_id`; `save_workout` only links to the caller's own active enrollment and completes it after the final session.
-- Programs tab filters by days/week (`features/programs/recommend.ts`: default = nearest to onboarding `training_days`; "Recommended" = nearest experience level). Every count 3–6 should keep at least one plan.
+- Programs tab: My programs, Featured (`featured = true`), then a days/week + level picker (`features/programs/recommend.ts`: default = onboarding `training_days`/`experience`). Every days × level combination (3–6 × 3) should keep at least one listed plan.
+- Programs v2 (`..._programs_v2.sql`): metadata columns (`split`, `tagline`, `warmup`, `progression`, `recovery`). **Never change a built-in's structure in place**: add a new slug and set the old one `listed = false` so enrolled users keep their plan. Metadata-only updates are fine.
+- Session length, weekly direct sets per muscle and equipment are computed client-side from program data (`features/programs/model.ts`), not stored.
+- Personal programs: `owner_id = user`, created/edited only through `save_program(payload)` (renumbers day positions 0..n-1 and sets `days_per_week`, which `active_program()` depends on). Customize = editor pre-filled from a built-in with `source_program_id`; nothing is written until Save, and copies are deep, so built-in changes never reach them. Users can't set `slug`/`featured` (check constraint). Deleting a program cascades its enrollments; workouts keep history.
+- Featured "Golden Era Split" is an Arnold-style split: no photos, no third-party source links or attributions in the app, his name not used as a title, and a no-affiliation line in the description.
 - Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
 
 ## Landing & motivation

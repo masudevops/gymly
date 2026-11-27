@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '@/features/auth/auth-provider';
+import type { DayExercise, SavePayload } from '@/features/programs/model';
 import type { ExerciseKind, TemplateSeed } from '@/features/workout/model';
 import type { Enums } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
 export type ProgramSummary = {
   id: string;
+  owner_id: string | null;
   slug: string | null;
   name: string;
   summary: string;
@@ -15,25 +17,32 @@ export type ProgramSummary = {
   days_per_week: number;
   weeks: number;
   equipment_note: string | null;
+  featured: boolean;
+  split: string | null;
+  tagline: string | null;
 };
+
+const SUMMARY_COLUMNS = 'id, owner_id, slug, name, summary, goal, level, days_per_week, weeks, equipment_note, featured, split, tagline';
+
+/** List rows carry just enough of each day to estimate session length. */
+export type ProgramListItem = ProgramSummary & { program_days: { program_day_exercises: { sets: number; rest_seconds: number | null }[] }[] };
 
 export type ProgramDay = {
   id: string;
   position: number;
   name: string;
   focus: string | null;
-  program_day_exercises: {
-    id: string;
-    position: number;
-    sets: number;
-    reps_min: number | null;
-    reps_max: number | null;
-    rest_seconds: number | null;
-    exercise: { id: string; name: string; kind: ExerciseKind };
-  }[];
+  program_day_exercises: (DayExercise & { id: string; position: number })[];
 };
 
-export type ProgramDetail = ProgramSummary & { description: string | null; program_days: ProgramDay[] };
+export type ProgramDetail = ProgramSummary & {
+  description: string | null;
+  warmup: string | null;
+  progression: string | null;
+  recovery: string | null;
+  source_program_id: string | null;
+  program_days: ProgramDay[];
+};
 
 export const LEVEL_LABELS: Record<Enums<'experience_level'>, string> = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
 export const GOAL_LABELS: Record<Enums<'training_goal'>, string> = {
@@ -41,10 +50,12 @@ export const GOAL_LABELS: Record<Enums<'training_goal'>, string> = {
   muscle: 'Muscle',
   general_fitness: 'General fitness',
   endurance: 'Endurance',
+  hybrid: 'Strength & size',
 };
 
 const useUid = () => useAuth().session?.user.id;
 
+/** Listed built-ins plus the user's own programs (RLS limits rows to those two). Replaced built-ins are unlisted. */
 export function usePrograms() {
   const uid = useUid();
   return useQuery({
@@ -54,10 +65,12 @@ export function usePrograms() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('programs')
-        .select('id, slug, name, summary, goal, level, days_per_week, weeks, equipment_note')
-        .order('days_per_week');
+        .select(`${SUMMARY_COLUMNS}, program_days(program_day_exercises(sets, rest_seconds))`)
+        .eq('listed', true)
+        .order('days_per_week')
+        .order('name');
       if (error) throw error;
-      return data as ProgramSummary[];
+      return data as unknown as ProgramListItem[];
     },
   });
 }
@@ -72,7 +85,7 @@ export function useProgram(id: string | undefined) {
       const { data, error } = await supabase
         .from('programs')
         .select(
-          'id, slug, name, summary, description, goal, level, days_per_week, weeks, equipment_note, program_days(id, position, name, focus, program_day_exercises(id, position, sets, reps_min, reps_max, rest_seconds, exercise:exercises(id, name, kind)))',
+          `${SUMMARY_COLUMNS}, description, warmup, progression, recovery, source_program_id, program_days(id, position, name, focus, program_day_exercises(id, position, sets, reps_min, reps_max, rest_seconds, notes, exercise:exercises(id, name, kind, primary_muscle, secondary_muscles, equipment)))`,
         )
         .eq('id', id!)
         .order('position', { referencedTable: 'program_days' })
@@ -120,6 +133,31 @@ export function useLeaveProgram() {
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['programs', 'active'] }),
+  });
+}
+
+/** Creates or updates one of the user's programs (see save_program). Returns the program id. */
+export function useSaveProgram() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: SavePayload) => {
+      const { data, error } = await supabase.rpc('save_program', { payload });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['programs'] }),
+  });
+}
+
+/** Deletes one of the user's programs; its enrollments go with it, logged workouts stay in history. */
+export function useDeleteProgram() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('programs').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['programs'] }),
   });
 }
 

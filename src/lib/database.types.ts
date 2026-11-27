@@ -133,17 +133,23 @@ isOneToOne: false
                   ]
                 },"programs": {
                   Row: {
-                    "created_at": string,"days_per_week": number,"description": string | null,"equipment_note": string | null,"goal": Database["public"]['Enums']["training_goal"],"id": string,"level": Database["public"]['Enums']["experience_level"],"name": string,"owner_id": string | null,"slug": string | null,"summary": string,"weeks": number
+                    "created_at": string,"days_per_week": number,"description": string | null,"equipment_note": string | null,"featured": boolean,"goal": Database["public"]['Enums']["training_goal"],"id": string,"level": Database["public"]['Enums']["experience_level"],"listed": boolean,"name": string,"owner_id": string | null,"progression": string | null,"recovery": string | null,"slug": string | null,"source_program_id": string | null,"split": string | null,"summary": string,"tagline": string | null,"updated_at": string,"warmup": string | null,"weeks": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"days_per_week": number,"description"?: string | null,"equipment_note"?: string | null,"goal": Database["public"]['Enums']["training_goal"],"id"?: string,"level": Database["public"]['Enums']["experience_level"],"name": string,"owner_id"?: string | null,"slug"?: string | null,"summary": string,"weeks": number
+                    "created_at"?: string,"days_per_week": number,"description"?: string | null,"equipment_note"?: string | null,"featured"?: boolean,"goal": Database["public"]['Enums']["training_goal"],"id"?: string,"level": Database["public"]['Enums']["experience_level"],"listed"?: boolean,"name": string,"owner_id"?: string | null,"progression"?: string | null,"recovery"?: string | null,"slug"?: string | null,"source_program_id"?: string | null,"split"?: string | null,"summary": string,"tagline"?: string | null,"updated_at"?: string,"warmup"?: string | null,"weeks": number
                   }
                   Update: {
-                    "created_at"?: string,"days_per_week"?: number,"description"?: string | null,"equipment_note"?: string | null,"goal"?: Database["public"]['Enums']["training_goal"],"id"?: string,"level"?: Database["public"]['Enums']["experience_level"],"name"?: string,"owner_id"?: string | null,"slug"?: string | null,"summary"?: string,"weeks"?: number
+                    "created_at"?: string,"days_per_week"?: number,"description"?: string | null,"equipment_note"?: string | null,"featured"?: boolean,"goal"?: Database["public"]['Enums']["training_goal"],"id"?: string,"level"?: Database["public"]['Enums']["experience_level"],"listed"?: boolean,"name"?: string,"owner_id"?: string | null,"progression"?: string | null,"recovery"?: string | null,"slug"?: string | null,"source_program_id"?: string | null,"split"?: string | null,"summary"?: string,"tagline"?: string | null,"updated_at"?: string,"warmup"?: string | null,"weeks"?: number
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "programs_source_program_id_fkey"
+      columns: ["source_program_id"]
+isOneToOne: false
+      referencedRelation: "programs"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"template_exercises": {
                   Row: {
@@ -300,6 +306,9 @@ isOneToOne: false
               "programs": number,"weeks_active": number,"workouts": number
             }[]
                            },
+"save_program":
+{ Args: { "payload": Json }; Returns: string
+                           },
 "save_template":
 { Args: { "payload": Json }; Returns: string
                            },
@@ -329,7 +338,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "enrollment_status": "active"|"completed"|"abandoned","equipment": "barbell"|"dumbbell"|"machine"|"cable"|"bodyweight"|"kettlebell"|"band"|"smith_machine"|"other","exercise_kind": "weight_reps"|"reps_only"|"duration","experience_level": "beginner"|"intermediate"|"advanced","muscle_group": "chest"|"back"|"shoulders"|"biceps"|"triceps"|"forearms"|"quads"|"hamstrings"|"glutes"|"calves"|"core"|"full_body"|"cardio","training_goal": "strength"|"muscle"|"general_fitness"|"endurance","unit_system": "kg"|"lb"
+            "enrollment_status": "active"|"completed"|"abandoned","equipment": "barbell"|"dumbbell"|"machine"|"cable"|"bodyweight"|"kettlebell"|"band"|"smith_machine"|"other","exercise_kind": "weight_reps"|"reps_only"|"duration","experience_level": "beginner"|"intermediate"|"advanced","muscle_group": "chest"|"back"|"shoulders"|"biceps"|"triceps"|"forearms"|"quads"|"hamstrings"|"glutes"|"calves"|"core"|"full_body"|"cardio","training_goal": "strength"|"muscle"|"general_fitness"|"endurance"|"hybrid","unit_system": "kg"|"lb"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -449,7 +458,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "enrollment_status": ["active", "completed", "abandoned"],"equipment": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "kettlebell", "band", "smith_machine", "other"],"exercise_kind": ["weight_reps", "reps_only", "duration"],"experience_level": ["beginner", "intermediate", "advanced"],"muscle_group": ["chest", "back", "shoulders", "biceps", "triceps", "forearms", "quads", "hamstrings", "glutes", "calves", "core", "full_body", "cardio"],"training_goal": ["strength", "muscle", "general_fitness", "endurance"],"unit_system": ["kg", "lb"]
+            "enrollment_status": ["active", "completed", "abandoned"],"equipment": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "kettlebell", "band", "smith_machine", "other"],"exercise_kind": ["weight_reps", "reps_only", "duration"],"experience_level": ["beginner", "intermediate", "advanced"],"muscle_group": ["chest", "back", "shoulders", "biceps", "triceps", "forearms", "quads", "hamstrings", "glutes", "calves", "core", "full_body", "cardio"],"training_goal": ["strength", "muscle", "general_fitness", "endurance", "hybrid"],"unit_system": ["kg", "lb"]
           }
         }
 } as const

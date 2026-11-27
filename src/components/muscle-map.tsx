@@ -85,13 +85,14 @@ function Figure({ regions, primary, secondary, label }: {
   );
 }
 
-/** Muscle map for an exercise. Cardio has no diagram (whole-body conditioning). */
-export function MuscleMap({ primary, secondary }: { primary: MuscleGroup; secondary: MuscleGroup[] }) {
-  if (primary === 'cardio') return null;
-  const p = new Set<MuscleGroup>([primary]);
-  const s = new Set<MuscleGroup>(secondary.filter((m) => m !== primary));
+/** Muscle map for an exercise (one primary) or a program (several). Cardio has no diagram (whole-body conditioning). */
+export function MuscleMap({ primary, secondary }: { primary: MuscleGroup | MuscleGroup[]; secondary: MuscleGroup[] }) {
+  const primaries = Array.isArray(primary) ? primary : [primary];
+  if (primaries.length === 0 || (primaries.length === 1 && primaries[0] === 'cardio')) return null;
+  const p = new Set<MuscleGroup>(primaries);
+  const s = new Set<MuscleGroup>(secondary.filter((m) => !p.has(m)));
   return (
-    <View accessible accessibilityRole="image" accessibilityLabel={`Works ${[primary, ...secondary].join(', ').replace(/_/g, ' ')}`}>
+    <View accessible accessibilityRole="image" accessibilityLabel={`Works ${[...primaries, ...secondary].join(', ').replace(/_/g, ' ')}`}>
       <View className="flex-row">
         <Figure regions={FRONT} primary={p} secondary={s} label="Front" />
         <Figure regions={BACK} primary={p} secondary={s} label="Back" />
