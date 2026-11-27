@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState, ErrorNote, Loading } from '@/components/form';
 import { AppText, Button } from '@/components/ui';
+import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useUnit } from '@/features/profile/api';
 import { useWorkoutHistory, type WorkoutSummary } from '@/features/workout/api';
 import { totalVolume } from '@/lib/fitness';
@@ -47,7 +48,12 @@ export default function HistoryScreen() {
         data={items}
         keyExtractor={(w) => w.id}
         contentContainerClassName="w-full max-w-2xl self-center gap-3 px-5 pb-10 pt-4"
-        ListHeaderComponent={<AppText variant="display" className="mb-3">History</AppText>}
+        ListHeaderComponent={
+          <View className="mb-3">
+            <AppText variant="display">History</AppText>
+            <DailyQuote context="history" className="mt-1" />
+          </View>
+        }
         renderItem={({ item }) => <WorkoutRow w={item} unit={unit} />}
         onEndReached={() => history.hasNextPage && !history.isFetchingNextPage && history.fetchNextPage()}
         onEndReachedThreshold={0.5}

@@ -48,17 +48,19 @@ function RootStack() {
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ink } }}>
-      <Stack.Protected guard={!signedIn}>
+      {/* Explicit redirects: the default fallback picks by route sort order (it would send signed-out users to sign-in). */}
+      <Stack.Protected guard={!signedIn} redirectTo="/">
+        <Stack.Screen name="welcome" options={{ title: 'Gymly · Train smarter. Get stronger.' }} />
         <Stack.Screen name="sign-in" options={{ title: 'Sign in · Gymly' }} />
         <Stack.Screen name="sign-up" options={{ title: 'Create account · Gymly' }} />
         <Stack.Screen name="forgot-password" options={{ title: 'Reset password · Gymly' }} />
       </Stack.Protected>
       {/* Opened from the reset email, which creates a recovery session, so it must work in any auth state. */}
       <Stack.Screen name="reset-password" options={{ title: 'New password · Gymly' }} />
-      <Stack.Protected guard={signedIn && !onboarded}>
+      <Stack.Protected guard={signedIn && !onboarded} redirectTo={signedIn ? '/' : '/welcome'}>
         <Stack.Screen name="onboarding" options={{ title: 'Welcome · Gymly' }} />
       </Stack.Protected>
-      <Stack.Protected guard={signedIn && onboarded}>
+      <Stack.Protected guard={signedIn && onboarded} redirectTo={signedIn ? '/onboarding' : '/welcome'}>
         <Stack.Screen name="(tabs)" options={{ title: 'Gymly' }} />
         <Stack.Screen name="workout" options={{ title: 'Workout · Gymly', presentation: 'fullScreenModal', gestureEnabled: false }} />
         <Stack.Screen name="exercises/index" />

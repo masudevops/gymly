@@ -111,7 +111,7 @@ test('account deletion requires typing DELETE and removes the user and their pho
   await expect(del).toBeEnabled();
   await del.click();
 
-  await expect(visibleText(page, 'Forgot password?')).toBeVisible({ timeout: 15_000 });
+  await expect(page).toHaveURL(/\/welcome$/, { timeout: 15_000 });
   expect(sql(`select count(*) from auth.users where email = '${email}'`)).toBe('0');
   expect(avatarFiles(uid)).toBe(0);
 });
