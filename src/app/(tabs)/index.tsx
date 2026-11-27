@@ -8,6 +8,7 @@ import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useActiveProgram } from '@/features/programs/api';
 import { useProfile } from '@/features/profile/api';
 import { useTrainingDays } from '@/features/progress/api';
+import { TabTitle } from '@/features/share/share-gymly';
 import { toTemplateSeed, useTemplates, type Template } from '@/features/templates/api';
 import { useNow } from '@/features/workout/components';
 import { useWorkoutStore } from '@/features/workout/store';
@@ -119,7 +120,7 @@ export default function TrainScreen() {
   return (
     <Screen>
       <AppText variant="label">{greeting(profile?.display_name)}</AppText>
-      <AppText variant="display" className="mt-1">Train</AppText>
+      <TabTitle title="Train" className="mt-1" />
       <DailyQuote context="train" className="mt-1" />
 
       <ActiveBanner />

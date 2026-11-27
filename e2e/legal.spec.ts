@@ -42,3 +42,15 @@ test('Share Gymly copies the public homepage link, not the current page', async 
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toBe(new URL('/', page.url()).toString());
 });
+
+test('the share icon on app tabs shares the homepage, not the tab the user is on', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.addInitScript(() => Object.defineProperty(navigator, 'share', { value: undefined }));
+  await signUp(page, 'share-tab');
+  await tap(page, 'History');
+  await expect(page).toHaveURL(/\/history$/);
+  // Inactive tabs stay mounted; the last match is the active tab's icon (same convention as tap()).
+  await page.getByRole('button', { name: 'Share Gymly' }).filter({ visible: true }).last().click();
+  await expect(page.getByRole('button', { name: 'Link copied' }).filter({ visible: true }).last()).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(new URL('/', page.url()).toString());
+});

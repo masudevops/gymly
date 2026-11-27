@@ -10,6 +10,7 @@ import { MUSCLE_LABELS, type MuscleGroup } from '@/features/exercises/api';
 import { DailyQuote } from '@/features/motivation/daily-quote';
 import { useProfile } from '@/features/profile/api';
 import { useBodyMeasurements, usePersonalRecords, useTrainingDays, useWeeklyMuscleSets } from '@/features/progress/api';
+import { TabTitle } from '@/features/share/share-gymly';
 import { cn } from '@/lib/cn';
 import { calendarWeeks, fromDay, shortDate, toDay, weekDays, weeklyStreak } from '@/lib/dates';
 import { formatClock, formatWeight } from '@/lib/format';
@@ -84,8 +85,8 @@ export default function ProgressScreen() {
   // Captured once per visit; render must stay pure for the React Compiler.
   const [now] = useState(() => Date.now());
 
-  if (trainingDays.isPending || records.isPending) return <Screen><AppText variant="display">Progress</AppText><Loading /></Screen>;
-  if (trainingDays.error || records.error) return <Screen><AppText variant="display">Progress</AppText><ErrorNote message="Couldn't load your stats." /></Screen>;
+  if (trainingDays.isPending || records.isPending) return <Screen><TabTitle title="Progress" /><Loading /></Screen>;
+  if (trainingDays.error || records.error) return <Screen><TabTitle title="Progress" /><ErrorNote message="Couldn't load your stats." /></Screen>;
 
   const dayMap = new Map(trainingDays.data.map((d) => [d.day, Number(d.volume_kg)]));
   const thisWeek = weekDays(new Date());
@@ -114,7 +115,7 @@ export default function ProgressScreen() {
 
   return (
     <Screen>
-      <AppText variant="display">Progress</AppText>
+      <TabTitle title="Progress" />
       <DailyQuote context="progress" className="mt-1" />
 
       <View className="mt-6 flex-row gap-3">

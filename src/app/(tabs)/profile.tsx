@@ -30,6 +30,7 @@ import { useAuth } from '@/features/auth/auth-provider';
 import { fetchAllWorkouts, useProfile, useProfileSummary, useUpdateProfile } from '@/features/profile/api';
 import { Avatar } from '@/features/profile/avatar';
 import { downloadFile, workoutsToCsv } from '@/features/profile/export';
+import { useShareGymly } from '@/features/share/share-gymly';
 import { usePendingSaveSync } from '@/features/workout/api';
 import { cn } from '@/lib/cn';
 import { confirm } from '@/lib/confirm';
@@ -255,27 +256,9 @@ function Divider() {
 }
 
 /** Settings row: icon, title/subtitle, then a control (children) or a chevron when it navigates. */
-/**
- * Shares the public homepage, never the current route: a link to an app screen would make Safari and
- * Messages preview whatever is on screen (names, stats) instead of the branded card.
- */
+/** Shares the public homepage, never the current route (see features/share/share-gymly.tsx). */
 function ShareRow() {
-  const [copied, setCopied] = useState(false);
-  const share = async () => {
-    const url = `${window.location.origin}/`;
-    if (typeof navigator.share === 'function') {
-      // Rejects when the user closes the share sheet; nothing to do then.
-      await navigator.share({ title: 'Gymly', text: 'Train smarter. Get stronger.', url }).catch(() => {});
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // Clipboard blocked (insecure context or permissions); the row simply does nothing.
-    }
-  };
+  const { share, copied } = useShareGymly();
   return <Row icon={Share2} title="Share Gymly" subtitle={copied ? 'Link copied' : 'Invite a friend to train with you'} onPress={share} />;
 }
 
