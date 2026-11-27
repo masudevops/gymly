@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { AppState } from 'react-native';
 
 import { useAuth } from '@/features/auth/auth-provider';
@@ -10,6 +10,9 @@ import type { SavePayload, UpdatePayload } from './model';
 import { useWorkoutStore } from './store';
 
 const PAGE = 20;
+
+// Shared across hook instances (the root layout and the Profile "Sync now" row) so only one flush runs at a time.
+let flushing = false;
 
 async function saveOne(payload: SavePayload) {
   const { error } = await supabase.rpc('save_workout', { payload: payload as unknown as Json });
@@ -26,13 +29,12 @@ export function usePendingSaveSync() {
   const queryClient = useQueryClient();
   const pending = useWorkoutStore((s) => s.pendingSaves);
   const markSaved = useWorkoutStore((s) => s.markSaved);
-  const running = useRef(false);
 
   const flush = useCallback(async () => {
-    if (!session || running.current) return;
+    if (!session || flushing) return;
     const queue = useWorkoutStore.getState().pendingSaves;
     if (queue.length === 0) return;
-    running.current = true;
+    flushing = true;
     try {
       for (const p of queue) {
         try {
@@ -47,7 +49,7 @@ export function usePendingSaveSync() {
       queryClient.invalidateQueries({ queryKey: ['stats'] });
       queryClient.invalidateQueries({ queryKey: ['programs', 'active'] });
     } finally {
-      running.current = false;
+      flushing = false;
     }
   }, [session, markSaved, queryClient]);
 

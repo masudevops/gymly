@@ -53,14 +53,14 @@ export type Database = {
                   ]
                 },"profiles": {
                   Row: {
-                    "created_at": string,"display_name": string | null,"experience": Database["public"]['Enums']["experience_level"] | null,"goal": Database["public"]['Enums']["training_goal"] | null,"id": string,"onboarded_at": string | null,"rest_seconds": number,"training_days": number | null,"unit": Database["public"]['Enums']["unit_system"],"updated_at": string
+                    "avatar_path": string | null,"created_at": string,"display_name": string | null,"experience": Database["public"]['Enums']["experience_level"] | null,"goal": Database["public"]['Enums']["training_goal"] | null,"id": string,"onboarded_at": string | null,"rest_seconds": number,"training_days": number | null,"unit": Database["public"]['Enums']["unit_system"],"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string | null,"experience"?: Database["public"]['Enums']["experience_level"] | null,"goal"?: Database["public"]['Enums']["training_goal"] | null,"id": string,"onboarded_at"?: string | null,"rest_seconds"?: number,"training_days"?: number | null,"unit"?: Database["public"]['Enums']["unit_system"],"updated_at"?: string
+                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string | null,"experience"?: Database["public"]['Enums']["experience_level"] | null,"goal"?: Database["public"]['Enums']["training_goal"] | null,"id": string,"onboarded_at"?: string | null,"rest_seconds"?: number,"training_days"?: number | null,"unit"?: Database["public"]['Enums']["unit_system"],"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string | null,"experience"?: Database["public"]['Enums']["experience_level"] | null,"goal"?: Database["public"]['Enums']["training_goal"] | null,"id"?: string,"onboarded_at"?: string | null,"rest_seconds"?: number,"training_days"?: number | null,"unit"?: Database["public"]['Enums']["unit_system"],"updated_at"?: string
+                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string | null,"experience"?: Database["public"]['Enums']["experience_level"] | null,"goal"?: Database["public"]['Enums']["training_goal"] | null,"id"?: string,"onboarded_at"?: string | null,"rest_seconds"?: number,"training_days"?: number | null,"unit"?: Database["public"]['Enums']["unit_system"],"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -293,6 +293,11 @@ isOneToOne: false
 "personal_records":
 { Args: Record<PropertyKey, never>; Returns: {
               "best_e1rm": number,"best_e1rm_at": string,"exercise_id": string,"heaviest_kg": number,"kind": Database["public"]['Enums']["exercise_kind"],"last_done": string,"longest_seconds": number,"most_reps": number,"name": string,"primary_muscle": Database["public"]['Enums']["muscle_group"],"sessions": number
+            }[]
+                           },
+"profile_summary":
+{ Args: { "p_tz": string }; Returns: {
+              "programs": number,"weeks_active": number,"workouts": number
             }[]
                            },
 "save_template":
