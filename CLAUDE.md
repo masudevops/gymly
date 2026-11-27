@@ -17,7 +17,7 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - `npx supabase start | status | migration new <name>`. **Ask first:** `supabase db reset`, `db push`, `link`.
 
 ## Architecture (Phase 1)
-- Auth gating via `Stack.Protected` in `src/app/_layout.tsx`: signed out → sign-in/up; no `onboarded_at` → onboarding; else app.
+- Auth gating via `Stack.Protected` in `src/app/_layout.tsx`: signed out → `/welcome` (public landing, `features/landing/`) → sign-in/up; no `onboarded_at` → onboarding; else app.
 - Active workout = pure model (`features/workout/model.ts`, unit-tested) + zustand store persisted to AsyncStorage. Finish moves it to `pendingSaves`; `usePendingSaveSync` pushes via the `save_workout` RPC (idempotent on the client-generated workout id), so offline workouts are never lost or duplicated.
 - Editing a saved workout: `/history/[id]/edit` uses `fromSavedWorkout`/`toUpdatePayload` and the `update_workout` RPC (replaces exercises/sets, keeps date and program link).
 - DB functions: `save_workout`, `update_workout`, `save_template`, `last_sets_for_exercises` (security invoker, RLS applies), `delete_account` (security definer). Regenerate types after schema changes: `npx supabase gen types typescript --local > src/lib/database.types.ts`.
@@ -36,6 +36,11 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - Program sessions are normal workouts with `enrollment_id`/`program_day_id`; `save_workout` only links to the caller's own active enrollment and completes it after the final session.
 - Programs tab filters by days/week (`features/programs/recommend.ts`: default = nearest to onboarding `training_days`; "Recommended" = nearest experience level). Every count 3–6 should keep at least one plan.
 - Start any workout via `useBeginWorkout()` (handles the "discard in-progress workout?" confirm).
+
+## Landing & motivation
+- `/welcome` is the first screen of the signed-out group; signed-out `/`, sign-out and account deletion land there. Previews in `features/landing/previews.tsx` are recreations from tokens with example data, not screenshots. Only advertise features that exist.
+- Brand mark in JS: `components/brand-mark.tsx` (keep in sync with `assets/brand/gymly-mark.svg`). SEO/OG tags live in `public/index.html` (single-page output, so they're static); `public/og.png` is 1200×630.
+- Daily quotes: `features/motivation/quotes.ts` (original lines per context, rotate at local midnight, unit-tested) rendered by `<DailyQuote context>`. Keep them short and unattributed; never during an active workout.
 
 ## Profile & account
 - Avatars: private `avatars` bucket, path `{user_id}/{uuid}.ext` (RLS on `storage.objects` by first folder), shown via signed URLs (`useAvatarUrl`). `profiles.avatar_path` must start with the user's id.
@@ -57,6 +62,9 @@ Premium workout tracker. One Expo codebase: web first (single-page app on Vercel
 - `Alert` is a no-op on web; use `lib/confirm.ts`.
 - Accessibility state: use `aria-checked` / `aria-selected` props. React Native Web 0.21 ignores the old `accessibilityState`, so screen readers wouldn't announce selection.
 - Web keeps previous stack screens mounted (hidden). In Playwright tests, target `input[...]:visible` or load the page directly.
+- Every `Stack.Protected` group in `_layout.tsx` sets `redirectTo`. Without it, the fallback picks the first unguarded route by Expo Router's sort order (not declaration order), which sent signed-out users to `/sign-in` instead of `/welcome`.
+- Expo Router typed routes (`.expo/types/router.d.ts`) only regenerate while the dev server runs; a new route fails `tsc` until you start it once.
+- Reanimated's `Animated.View` ignores `className` unless registered with `cssInterop` (see `features/landing/landing.tsx`).
 - Background dev servers die after their time limit; restart with a long timeout and check `curl localhost:8081` before browser tests.
 
 ## Conventions
