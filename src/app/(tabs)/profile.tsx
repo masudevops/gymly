@@ -18,11 +18,12 @@ import {
   ShieldCheck,
   Target,
   Timer,
+  TrendingUp,
   UserCog,
   type LucideIcon,
 } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
-import { ActivityIndicator, Linking, Platform, Pressable, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, Pressable, Switch, View } from 'react-native';
 
 import { ErrorNote, Loading, Segmented, Stepper } from '@/components/form';
 import { AppText, Button, Card, Screen } from '@/components/ui';
@@ -121,6 +122,18 @@ export default function ProfileScreen() {
             canIncrement={goal < 7}
             onDecrement={() => update.mutate({ training_days: Math.max(1, goal - 1) })}
             onIncrement={() => update.mutate({ training_days: Math.min(7, goal + 1) })}
+          />
+        </Row>
+        <Divider />
+        <Row icon={TrendingUp} title="Progression hints" subtitle="Suggest the next weight or reps in program sessions">
+          <Switch
+            accessibilityLabel="Progression hints"
+            value={p.progression_hints}
+            onValueChange={(progression_hints) => update.mutate({ progression_hints })}
+            trackColor={{ false: colors.line, true: colors.volt }}
+            thumbColor={colors.fg}
+            // react-native-web only: otherwise the "on" thumb is its default teal. Native ignores it.
+            {...({ activeThumbColor: colors.fg } as object)}
           />
         </Row>
         {update.error && <View className="pb-4"><ErrorNote message="Couldn't save that change. Check your connection and try again." /></View>}

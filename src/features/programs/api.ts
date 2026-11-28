@@ -172,6 +172,7 @@ export function programDaySeed(day: ProgramDay, enrollmentId: string, week: numb
       targetSets: e.sets,
       targetRepsMin: e.reps_min,
       restSeconds: e.rest_seconds,
+      progression: e.reps_min === null ? null : { repsMin: e.reps_min, repsMax: e.reps_max ?? e.reps_min, equipment: e.exercise.equipment },
     })),
   };
 }

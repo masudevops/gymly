@@ -7,6 +7,7 @@ import type { Json } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
 import type { SavePayload, UpdatePayload } from './model';
+import type { PastSet } from './overload';
 import { useWorkoutStore } from './store';
 
 const PAGE = 20;
@@ -141,6 +142,32 @@ export function useLastSets(exerciseIds: string[]) {
       if (error) throw error;
       const map: Record<string, LastSet[]> = {};
       for (const row of data) (map[row.exercise_id] ??= []).push(row);
+      return map;
+    },
+  });
+}
+
+/**
+ * Working sets from the last few sessions of each exercise, newest session first, keyed by exercise id.
+ * Feeds the progression hints; only enabled for program sessions with hints switched on.
+ */
+export function useRecentSessions(exerciseIds: string[], enabled: boolean) {
+  const ids = [...new Set(exerciseIds)].sort();
+  return useQuery({
+    queryKey: ['last-sets', 'recent', ids],
+    enabled: enabled && ids.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('recent_sets_for_exercises', { exercise_ids: ids, sessions: 3 });
+      if (error) throw error;
+      const map: Record<string, PastSet[][]> = {};
+      for (const row of data) {
+        if (row.is_warmup) continue;
+        const sessions = (map[row.exercise_id] ??= []);
+        (sessions[row.session_index] ??= []).push({ weightKg: row.weight_kg === null ? null : Number(row.weight_kg), reps: row.reps });
+      }
+      // A session made only of warm-ups leaves a hole; drop it so index 0 is the latest real session.
+      for (const id of Object.keys(map)) map[id] = map[id].filter(Boolean);
       return map;
     },
   });

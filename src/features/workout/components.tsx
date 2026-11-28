@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { Check, ChevronDown, ChevronUp, Info, Minus, Plus, Timer, Trash2, X } from 'lucide-react-native';
+import { Check, ChevronDown, ChevronUp, Info, Minus, Plus, Timer, Trash2, TrendingDown, TrendingUp, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, TextInput, View } from 'react-native';
 
@@ -13,6 +13,7 @@ import { colors } from '@/theme/tokens';
 
 import type { LastSet } from './api';
 import { isSetComplete, type SetEntry, type WorkoutExercise } from './model';
+import { canApply, formatLast, formatSuggestion, type Hint } from './overload';
 import { useWorkoutStore } from './store';
 
 const haptic = (style: 'light' | 'success' | 'warning') => {
@@ -181,11 +182,42 @@ function numberSets(sets: SetEntry[], previous: LastSet[]) {
   });
 }
 
+/** One-line progression hint under the exercise name. Tapping fills unticked working sets; nothing else changes. */
+function HintLine({ exercise, hint, unit }: { exercise: WorkoutExercise; hint: Hint; unit: Unit }) {
+  const apply = useWorkoutStore((s) => s.applySuggestion);
+  const { suggestion } = hint;
+  const Icon = suggestion.kind === 'deload' ? TrendingDown : TrendingUp;
+  const text = `Last: ${formatLast(exercise.kind, hint.last, unit)} → ${formatSuggestion(suggestion, unit)}`;
+  const body = (
+    <>
+      <Icon color={suggestion.kind === 'deload' ? colors.warning : colors.volt} size={16} />
+      <AppText variant="caption" className="flex-1 text-muted">{text}</AppText>
+      {canApply(suggestion) && <AppText variant="caption" className="font-semibold text-volt">Apply</AppText>}
+    </>
+  );
+  const box = 'mb-2 flex-row items-center gap-2 rounded-lg px-2 py-1.5';
+  if (!canApply(suggestion)) return <View className={box}>{body}</View>;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${text}. Apply to sets not yet completed`}
+      onPress={() => {
+        apply(exercise.key, { weightKg: suggestion.weightKg, reps: suggestion.reps });
+        haptic('light');
+      }}
+      className={cn(box, 'bg-raised active:bg-line')}
+    >
+      {body}
+    </Pressable>
+  );
+}
+
 export function ExerciseCard({
   exercise,
   index,
   total,
   previous,
+  hint,
   unit,
   defaultRest,
 }: {
@@ -193,6 +225,7 @@ export function ExerciseCard({
   index: number;
   total: number;
   previous: LastSet[] | undefined;
+  hint?: Hint | null;
   unit: Unit;
   defaultRest: number;
 }) {
@@ -221,6 +254,8 @@ export function ExerciseCard({
           <Trash2 color={colors.danger} size={18} />
         </IconButton>
       </View>
+
+      {hint && <HintLine exercise={exercise} hint={hint} unit={unit} />}
 
       <View className="mb-1 flex-row items-center gap-2 px-2">
         <AppText variant="caption" className="w-9 text-center">SET</AppText>
